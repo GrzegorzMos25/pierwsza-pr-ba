@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan posiłków — Pierwsze Łyżeczki</title>
+<style>
+  :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; --warn:#C2542E; --warn-soft:#FBE7DE; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.6; }
+  .display { font-family:Georgia,'Iowan Old Style',serif; }
+  .back-link { display:block; max-width:900px; margin:24px auto 0; padding:0 24px; font-size:14px; color:var(--leaf); text-decoration:none; }
+  .back-link:hover { text-decoration:underline; }
+  header { padding:24px 24px 16px; max-width:900px; margin:0 auto; text-align:center; }
+  .eyebrow { display:inline-block; background:var(--pumpkin-soft); color:var(--pumpkin); font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px; margin-bottom:20px; }
+  h1 { font-size:38px; font-weight:700; color:var(--leaf); margin-bottom:12px; letter-spacing:-0.01em; }
+  .subtitle { font-size:16px; color:#5C6B5F; max-width:540px; margin:0 auto; }
+  main { max-width:900px; margin:0 auto; padding:24px 24px 80px; }
+
+  .milk-note {
+    background:white; border:1px solid var(--line); border-radius:14px;
+    padding:18px 24px; margin-bottom:28px; font-size:14px; color:#5C6B5F;
+  }
+  .milk-note strong { color:var(--leaf); }
+
+  .day-card {
+    background:white; border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:16px;
+  }
+  .day-card h2 { font-size:18px; color:var(--leaf); margin-bottom:14px; }
+  .meal-row {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:10px 0; border-bottom:1px dashed var(--line); gap:12px; flex-wrap:wrap;
+  }
+  .meal-row:last-child { border-bottom:none; }
+  .meal-left { display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+  .meal-type {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--pumpkin); min-width:90px;
+  }
+  .meal-name a { color:var(--ink); text-decoration:none; font-size:14px; font-weight:600; }
+  .meal-name a:hover { color:var(--pumpkin); text-decoration:underline; }
+  .meal-amount { font-size:13px; color:#9AA59A; white-space:nowrap; }
+
+  .summary {
+    background:white; border:2px solid var(--pumpkin); border-radius:16px;
+    padding:28px 32px; margin-top:32px;
+  }
+  .summary h2 { font-size:20px; color:var(--leaf); margin-bottom:6px; }
+  .summary .sub { font-size:13px; color:#9AA59A; margin-bottom:20px; }
+
+  .group-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px dashed var(--line);
+  }
+  .group-row:last-child { border-bottom:none; }
+  .group-name { font-size:14px; font-weight:600; }
+  .group-count { font-size:13px; color:#6B786D; }
+  .group-bar-bg { flex:1; height:8px; background:var(--leaf-soft); border-radius:100px; margin:0 16px; overflow:hidden; }
+  .group-bar-fill { height:100%; background:var(--leaf); border-radius:100px; }
+  .group-row.low .group-bar-fill { background:var(--warn); }
+  .group-row.low .group-count { color:var(--warn); font-weight:700; }
+
+  .note-box {
+    margin-top:20px; padding:14px 18px; background:var(--warn-soft);
+    border-radius:10px; font-size:13px; color:var(--warn);
+  }
+
+  .disclaimer {
+    margin-top:24px; padding:18px 22px; background:var(--leaf-soft);
+    border-radius:12px; font-size:13px; color:var(--leaf);
+  }
+
+  footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
+
+  @media (max-width:600px) {
+    h1 { font-size:30px; }
+    .day-card { padding:18px 20px; }
+    .meal-type { min-width:70px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Strona główna</a>
+
+<header>
+  <span class="eyebrow">Plan posiłków</span>
+  <h1 class="display">Tydzień na talerzu</h1>
+  <p class="subtitle">Przykładowy plan posiłków dopasowany do aktualnego etapu rozszerzania diety.</p>
+</header>
+
+<main>
+  <div class="milk-note">
+    <strong>Mleko mamy lub mleko modyfikowane:</strong> wciąż ważny element diety na tym etapie — podawane dodatkowo, najczęściej po przebudzeniu i przed snem (2–3 razy dziennie, niezależnie od posiłków w tabeli).
+  </div>
+
+  <div id="week-container"></div>
+
+  <div class="summary">
+    <h2>Co dostarczamy w tym tygodniu</h2>
+    <div class="sub">Liczba posiłków z danej grupy produktów w ciągu 7 dni</div>
+    <div id="group-summary"></div>
+    <div class="note-box" id="low-note" style="display:none;"></div>
+  </div>
+
+  <div class="disclaimer">
+    Plan ma charakter przykładowy i orientacyjny. Ilości i częstotliwość posiłków warto dopasować do apetytu i tempa rozwoju konkretnego dziecka — w razie wątpliwości skonsultuj się z pediatrą lub dietetykiem dziecięcym.
+  </div>
+</main>
+
+<footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+
+<script>
+  const meals = {
+    owsianka: { name: "Owsianka z gruszką i cynamonem", link: "owsianka-gruszka.html", groups: ["zboża","owoce"] },
+    kurczak:  { name: "Kurczak z batatami i brokułem", link: "kurczak-bataty-brokul.html", groups: ["białko","warzywa","węglowodany","tłuszcze"] },
+    ryba:     { name: "Rybne kotlety z ziemniakiem", link: "rybne-kotlety.html", groups: ["białko","węglowodany","tłuszcze"] },
+    slupki:   { name: "Słupki warzywne na parze", link: "slupki-warzywne.html", groups: ["warzywa"] },
+    jogurt:   { name: "Jogurt z owocami i płatkami", link: "jogurt-owoce-platki.html", groups: ["nabiał","owoce","zboża"] },
+    dynia:    { name: "Puree z dyni", link: "puree-z-dyni.html", groups: ["warzywa"] },
+    jablko:   { name: "Puree z jabłka", link: "puree-z-jablka.html", groups: ["owoce"] }
+  };
+
+  const week = [
+    { day: "Poniedziałek", slots: [
+      { type: "Śniadanie", key: "owsianka", amount: "180 g" },
+      { type: "Obiad", key: "kurczak", amount: "200 g" },
+      { type: "Podwieczorek", key: "jogurt", amount: "100 g" },
+      { type: "Kolacja", key: "dynia", amount: "150 g" }
+    ]},
+    { day: "Wtorek", slots: [
+      { type: "Śniadanie", key: "jogurt", amount: "120 g" },
+      { type: "Obiad", key: "ryba", amount: "200 g" },
+      { type: "Podwieczorek", key: "slupki", amount: "60 g" },
+      { type: "Kolacja", key: "owsianka", amount: "150 g" }
+    ]},
+    { day: "Środa", slots: [
+      { type: "Śniadanie", key: "owsianka", amount: "180 g" },
+      { type: "Obiad", key: "kurczak", amount: "200 g" },
+      { type: "Podwieczorek", key: "jablko", amount: "100 g" },
+      { type: "Kolacja", key: "slupki", amount: "60 g" }
+    ]},
+    { day: "Czwartek", slots: [
+      { type: "Śniadanie", key: "jogurt", amount: "120 g" },
+      { type: "Obiad", key: "ryba", amount: "200 g" },
+      { type: "Podwieczorek", key: "dynia", amount: "100 g" },
+      { type: "Kolacja", key: "owsianka", amount: "150 g" }
+    ]},
+    { day: "Piątek", slots: [
+      { type: "Śniadanie", key: "owsianka", amount: "180 g" },
+      { type: "Obiad", key: "kurczak", amount: "200 g" },
+      { type: "Podwieczorek", key: "slupki", amount: "60 g" },
+      { type: "Kolacja", key: "jablko", amount: "100 g" }
+    ]},
+    { day: "Sobota", slots: [
+      { type: "Śniadanie", key: "jogurt", amount: "120 g" },
+      { type: "Obiad", key: "ryba", amount: "200 g" },
+      { type: "Podwieczorek", key: "slupki", amount: "60 g" },
+      { type: "Kolacja", key: "dynia", amount: "150 g" }
+    ]},
+    { day: "Niedziela", slots: [
+      { type: "Śniadanie", key: "owsianka", amount: "180 g" },
+      { type: "Obiad", key: "kurczak", amount: "200 g" },
+      { type: "Podwieczorek", key: "jablko", amount: "100 g" },
+      { type: "Kolacja", key: "ryba", amount: "150 g" }
+    ]}
+  ];
+
+  const weekContainer = document.getElementById('week-container');
+  const groupCounts = {};
+
+  week.forEach(day => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    let html = `<h2 class="display">${day.day}</h2>`;
+    day.slots.forEach(slot => {
+      const meal = meals[slot.key];
+      meal.groups.forEach(g => { groupCounts[g] = (groupCounts[g] || 0) + 1; });
+      html += `
+        <div class="meal-row">
+          <div class="meal-left">
+            <span class="meal-type">${slot.type}</span>
+            <span class="meal-name"><a href="${meal.link}">${meal.name}</a></span>
+          </div>
+          <span class="meal-amount">${slot.amount}</span>
+        </div>
+      `;
+    });
+    card.innerHTML = html;
+    weekContainer.appendChild(card);
+  });
+
+  const groupLabels = {
+    "warzywa": "Warzywa",
+    "owoce": "Owoce",
+    "zboża": "Zboża / węglowodany",
+    "białko": "Białko (mięso, ryby)",
+    "węglowodany": "Węglowodany (dodatkowo)",
+    "nabiał": "Nabiał",
+    "tłuszcze": "Zdrowe tłuszcze"
+  };
+
+  // łączymy "zboża" i "węglowodany" w jedną wizualną kategorię, by nie duplikować
+  const displayGroups = ["warzywa", "owoce", "zboża", "białko", "nabiał", "tłuszcze"];
+  if (groupCounts["węglowodany"]) {
+    groupCounts["zboża"] = (groupCounts["zboża"] || 0) + groupCounts["węglowodany"];
+  }
+
+  const summaryEl = document.getElementById('group-summary');
+  const maxCount = 14; // 7 dni x 2 jako orientacyjny pełny pasek
+  const lowGroups = [];
+
+  displayGroups.forEach(g => {
+    const count = groupCounts[g] || 0;
+    const pct = Math.min(100, Math.round((count / maxCount) * 100));
+    const isLow = count <= 3;
+    if (isLow) lowGroups.push(groupLabels[g]);
+
+    const row = document.createElement('div');
+    row.className = 'group-row' + (isLow ? ' low' : '');
+    row.innerHTML = `
+      <span class="group-name">${groupLabels[g]}</span>
+      <div class="group-bar-bg"><div class="group-bar-fill" style="width:${pct}%"></div></div>
+      <span class="group-count">${count}× w tygodniu</span>
+    `;
+    summaryEl.appendChild(row);
+  });
+
+  if (lowGroups.length) {
+    const note = document.getElementById('low-note');
+    note.style.display = 'block';
+    note.textContent = `Warto rozważyć więcej posiłków z grupy: ${lowGroups.join(', ')} — te elementy pojawiają się w tym tygodniu rzadziej niż inne.`;
+  }
+</script>
+
+</body>
+</html>
