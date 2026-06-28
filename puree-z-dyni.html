@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puree z dyni — Pierwsze Łyżeczki</title>
+<style>
+  :root {
+    --paper: #FAF6EE;
+    --ink: #2E4234;
+    --leaf: #3D5A45;
+    --leaf-soft: #DCE8D8;
+    --pumpkin: #E8833A;
+    --pumpkin-soft: #FBE3CE;
+    --line: #D8CFBC;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  .display {
+    font-family: Georgia, 'Iowan Old Style', serif;
+  }
+
+  .back-link {
+    display: block;
+    max-width: 720px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    font-size: 14px;
+    color: var(--leaf);
+    text-decoration: none;
+  }
+
+  .back-link:hover { text-decoration: underline; }
+
+  header {
+    padding: 24px 24px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    background: var(--pumpkin-soft);
+    color: var(--pumpkin);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--leaf);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 17px;
+    color: #5C6B5F;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    text-align: center;
+  }
+
+  .meta-item .num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--pumpkin);
+    display: block;
+  }
+
+  .meta-item .label {
+    font-size: 12px;
+    color: #7A8779;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 36px;
+    margin-bottom: 28px;
+  }
+
+  .card h2 {
+    font-size: 22px;
+    color: var(--leaf);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card h2::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pumpkin);
+    display: inline-block;
+  }
+
+  ul.ingredients {
+    list-style: none;
+  }
+
+  ul.ingredients li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 15px;
+  }
+
+  ul.ingredients li:last-child {
+    border-bottom: none;
+  }
+
+  ul.ingredients li .amount {
+    font-weight: 700;
+    color: var(--leaf);
+    min-width: 90px;
+  }
+
+  ol.steps {
+    list-style: none;
+    counter-reset: step;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 0 44px;
+    margin-bottom: 22px;
+    font-size: 15px;
+  }
+
+  ol.steps li:last-child { margin-bottom: 0; }
+
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--leaf-soft);
+    color: var(--leaf);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .safety {
+    background: var(--leaf-soft);
+    border: none;
+  }
+
+  .safety h2::before {
+    background: var(--leaf);
+  }
+
+  .safety p {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .safety p:last-child { margin-bottom: 0; }
+
+  .safety strong {
+    color: var(--leaf);
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px 24px 56px;
+    font-size: 13px;
+    color: #9AA59A;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 32px; }
+    .card { padding: 24px; }
+    header { padding: 16px 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
+
+<header>
+  <span class="eyebrow">Pierwsze łyżeczki · 6+ miesięcy</span>
+  <h1 class="display">Puree z dyni</h1>
+  <p class="subtitle">Słodkie, gładkie i delikatne — klasyczny pierwszy posiłek przy rozszerzaniu diety.</p>
+
+  <div class="meta-row">
+    <div class="meta-item">
+      <span class="num">15 min</span>
+      <span class="label">Czas</span>
+    </div>
+    <div class="meta-item">
+      <span class="num">3</span>
+      <span class="label">Składniki</span>
+    </div>
+    <div class="meta-item">
+      <span class="num">1 porcja</span>
+      <span class="label">Wydajność</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <h2>Składniki</h2>
+    <ul class="ingredients">
+      <li><span class="amount">150 g</span> dyni (np. hokkaido lub piżmowej), obranej i pokrojonej w kostkę</li>
+      <li><span class="amount">100 ml</span> wody lub mleka mamy/mleka modyfikowanego</li>
+      <li><span class="amount">opcjonalnie</span> kilka kropli oliwy z oliwek</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Przygotowanie</h2>
+    <ol class="steps">
+      <li>Dynię umyj, obierz ze skórki i usuń pestki. Pokrój w kostkę o boku ok. 2 cm.</li>
+      <li>Włóż dynię do garnka, zalej wodą (powinna lekko przykrywać kostki) i gotuj pod przykryciem na małym ogniu ok. 10–12 minut, do całkowitego zmiękczenia.</li>
+      <li>Odlej większość wody (zachowaj kilka łyżek na wypadek, gdyby puree było za gęste), a dynię przełóż do blendera lub miski.</li>
+      <li>Zblenduj na gładkie puree, dodając odlaną wodę lub mleko, aż uzyskasz konsystencję gładkiego jogurtu.</li>
+      <li>Przed podaniem sprawdź temperaturę — powinna być letnia, nie gorąca. Podawaj łyżeczką, pozwalając dziecku samodzielnie decydować o tempie.</li>
+    </ol>
+  </div>
+
+  <div class="card safety">
+    <h2>Bezpieczeństwo i wskazówki</h2>
+    <p><strong>Pierwsze podanie:</strong> podawaj nowy produkt w pierwszej połowie dnia, najlepiej rano — łatwiej zaobserwować ewentualną reakcję alergiczną w ciągu dnia.</p>
+    <p><strong>Konsystencja:</strong> dla dziecka zaczynającego rozszerzanie diety puree powinno być całkowicie gładkie, bez kawałków.</p>
+    <p><strong>Przechowywanie:</strong> nadmiar puree można przechowywać w lodówce do 48h lub zamrozić w pojemnikach porcjowych do 1 miesiąca.</p>
+    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym — w razie wątpliwości dotyczących rozszerzania diety skonsultuj się ze specjalistą.</p>
+  </div>
+
+</main>
+
+<footer>
+  Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.
+</footer>
+
+</body>
+</html>
