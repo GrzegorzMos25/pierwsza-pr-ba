@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil dziecka — Pierwsze Łyżeczki</title>
+<style>
+  :root {
+    --paper: #FAF6EE;
+    --ink: #2E4234;
+    --leaf: #3D5A45;
+    --leaf-soft: #DCE8D8;
+    --pumpkin: #E8833A;
+    --pumpkin-soft: #FBE3CE;
+    --line: #D8CFBC;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  .display { font-family: Georgia, 'Iowan Old Style', serif; }
+
+  .back-link {
+    display: block;
+    max-width: 560px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    font-size: 14px;
+    color: var(--leaf);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  header {
+    padding: 24px 24px 40px;
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    background: var(--pumpkin-soft);
+    color: var(--pumpkin);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--leaf);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #5C6B5F;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 36px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--leaf);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+
+  .field { margin-bottom: 24px; }
+
+  input[type="text"], input[type="date"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--pumpkin);
+  }
+
+  button {
+    width: 100%;
+    padding: 16px;
+    background: var(--leaf);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  button:hover { background: #324739; }
+
+  .confirmation {
+    display: none;
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--leaf-soft);
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--leaf);
+  }
+
+  .confirmation a {
+    color: var(--leaf);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px 24px 56px;
+    font-size: 13px;
+    color: #9AA59A;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Strona główna</a>
+
+<header>
+  <span class="eyebrow">Ustawienia</span>
+  <h1 class="display">Profil dziecka</h1>
+  <p class="subtitle">Te dane pozwolą nam pokazać Ci kalendarz rozszerzania diety dopasowany do wieku dziecka.</p>
+</header>
+
+<main>
+  <div class="card">
+    <form id="profile-form">
+      <div class="field">
+        <label for="child-name">Imię dziecka</label>
+        <input type="text" id="child-name" placeholder="np. Zosia" required>
+      </div>
+      <div class="field">
+        <label for="child-birthdate">Data urodzenia</label>
+        <input type="date" id="child-birthdate" required>
+      </div>
+      <button type="submit">Zapisz profil</button>
+    </form>
+
+    <div class="confirmation" id="confirmation">
+      Profil zapisany — <a href="kalendarz.html">przejdź do kalendarza &rarr;</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Dane zapisywane są tylko w tej przeglądarce, na tym urządzeniu.
+</footer>
+
+<script>
+  const form = document.getElementById('profile-form');
+  const nameInput = document.getElementById('child-name');
+  const birthdateInput = document.getElementById('child-birthdate');
+  const confirmation = document.getElementById('confirmation');
+
+  // Wczytaj istniejący profil, jeśli już zapisany
+  const existing = localStorage.getItem('pl_profile');
+  if (existing) {
+    const data = JSON.parse(existing);
+    nameInput.value = data.name || '';
+    birthdateInput.value = data.birthdate || '';
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const profile = {
+      name: nameInput.value.trim(),
+      birthdate: birthdateInput.value
+    };
+    localStorage.setItem('pl_profile', JSON.stringify(profile));
+    confirmation.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>

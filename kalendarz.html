@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalendarz rozszerzania diety — Pierwsze Łyżeczki</title>
+<style>
+  :root {
+    --paper: #FAF6EE;
+    --ink: #2E4234;
+    --leaf: #3D5A45;
+    --leaf-soft: #DCE8D8;
+    --pumpkin: #E8833A;
+    --pumpkin-soft: #FBE3CE;
+    --line: #D8CFBC;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  .display { font-family: Georgia, 'Iowan Old Style', serif; }
+
+  .back-link {
+    display: block;
+    max-width: 720px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    font-size: 14px;
+    color: var(--leaf);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  header {
+    padding: 24px 24px 16px;
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    background: var(--pumpkin-soft);
+    color: var(--pumpkin);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--leaf);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #5C6B5F;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 24px 80px;
+  }
+
+  /* Karta gdy brak profilu */
+  .no-profile {
+    background: white;
+    border: 1px dashed var(--line);
+    border-radius: 18px;
+    padding: 48px 36px;
+    text-align: center;
+  }
+  .no-profile p { color: #6B786D; margin-bottom: 20px; }
+  .no-profile a {
+    display: inline-block;
+    background: var(--leaf);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  /* Pasek info o dziecku */
+  .child-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .child-bar .name {
+    font-weight: 700;
+    color: var(--leaf);
+    font-size: 16px;
+  }
+
+  .child-bar .age {
+    font-size: 14px;
+    color: #6B786D;
+  }
+
+  .child-bar a {
+    font-size: 13px;
+    color: var(--pumpkin);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  /* Timeline */
+  .timeline {
+    list-style: none;
+  }
+
+  .stage {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    position: relative;
+    opacity: 0.55;
+  }
+
+  .stage.past {
+    opacity: 0.85;
+  }
+
+  .stage.current {
+    opacity: 1;
+    border-color: var(--pumpkin);
+    border-width: 2px;
+    box-shadow: 0 4px 18px rgba(232, 131, 58, 0.12);
+  }
+
+  .stage-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stage-month {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--leaf);
+  }
+
+  .stage-dates {
+    font-size: 12px;
+    color: #9AA59A;
+  }
+
+  .stage.current .stage-month {
+    color: var(--pumpkin);
+  }
+
+  .now-badge {
+    background: var(--pumpkin);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-left: 8px;
+  }
+
+  .done-badge {
+    color: var(--leaf);
+    font-size: 12px;
+  }
+
+  .stage h2 {
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .stage p {
+    font-size: 14px;
+    color: #5C6B5F;
+  }
+
+  .disclaimer {
+    margin-top: 32px;
+    padding: 18px 22px;
+    background: var(--leaf-soft);
+    border-radius: 12px;
+    font-size: 13px;
+    color: var(--leaf);
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px 24px 56px;
+    font-size: 13px;
+    color: #9AA59A;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Strona główna</a>
+
+<header>
+  <span class="eyebrow">Kalendarz</span>
+  <h1 class="display">Rozszerzanie diety</h1>
+  <p class="subtitle">Etapy od 6. do 12. miesiąca życia, dopasowane do wieku Twojego dziecka.</p>
+</header>
+
+<main>
+
+  <div class="no-profile" id="no-profile" style="display:none;">
+    <p>Żeby zobaczyć kalendarz dopasowany do wieku dziecka, najpierw uzupełnij jego profil.</p>
+    <a href="profil.html">Uzupełnij profil dziecka</a>
+  </div>
+
+  <div id="calendar-view" style="display:none;">
+    <div class="child-bar">
+      <div>
+        <div class="name" id="child-name-display"></div>
+        <div class="age" id="child-age-display"></div>
+      </div>
+      <a href="profil.html">Edytuj profil</a>
+    </div>
+
+    <ul class="timeline" id="timeline"></ul>
+
+    <div class="disclaimer">
+      Etapy mają charakter ogólny i orientacyjny. Każde dziecko rozwija się w innym tempie — przed wprowadzaniem nowych produktów, zwłaszcza potencjalnych alergenów, skonsultuj się z pediatrą lub dietetykiem dziecięcym.
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.
+</footer>
+
+<script>
+  const stages = [
+    {
+      month: 0,
+      label: "0–5 miesiąc",
+      title: "Wyłącznie mleko",
+      text: "Dieta dziecka opiera się wyłącznie na mleku mamy lub mleku modyfikowanym. Pokarmy uzupełniające nie są jeszcze wprowadzane."
+    },
+    {
+      month: 6,
+      label: "6. miesiąc",
+      title: "Start rozszerzania diety",
+      text: "Pierwsze warzywa (dynia, kalafior, brokuł, cukinia, ziemniak), pierwsze owoce (jabłko, gruszka, banan), kaszki bezglutenowe, niewielkie ilości glutenu, gotowane na twardo żółtko jaja, mięso (kurczak, indyk, królik)."
+    },
+    {
+      month: 7,
+      label: "7. miesiąc",
+      title: "Więcej warzyw i białka",
+      text: "Kolejne warzywa i owoce (burak, pietruszka, śliwka), kasze z glutenem, rośliny strączkowe w formie puree, naturalny jogurt bez dodatku cukru."
+    },
+    {
+      month: 8,
+      label: "8. miesiąc",
+      title: "Nowe tekstury",
+      text: "Posiłki z drobnymi grudkami, finger food (miękko ugotowane słupki warzyw), ryby (z uwagą na reakcje alergiczne), produkty pełnoziarniste."
+    },
+    {
+      month: 9,
+      label: "9. miesiąc",
+      title: "Większa różnorodność",
+      text: "Mięso czerwone, szerszy wybór ryb, posiłki rodzinne w wersji zmodyfikowanej (bez soli, cukru i miodu), więcej różnych tekstur na talerzu."
+    },
+    {
+      month: 10,
+      label: "10. miesiąc",
+      title: "Samodzielność przy jedzeniu",
+      text: "Pokarmy pokrojone w małe kawałki, dziecko coraz częściej je samodzielnie łyżką, łagodne przyprawy (np. cynamon, bazylia)."
+    },
+    {
+      month: 11,
+      label: "11. miesiąc",
+      title: "Dieta rodzinna w wersji adaptowanej",
+      text: "Większość produktów jest już wprowadzona. Posiłki zbliżone do rodzinnych, wciąż bez dodatku soli, cukru i miodu."
+    },
+    {
+      month: 12,
+      label: "12. miesiąc",
+      title: "Pierwsze urodziny",
+      text: "Konsystencja posiłków bliższa dorosłej. Po konsultacji z pediatrą możliwe wprowadzenie mleka krowiego jako napoju oraz miodu."
+    }
+  ];
+
+  function addMonths(date, months) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  function formatDate(date) {
+    return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function monthsBetween(start, end) {
+    let months = (end.getFullYear() - start.getFullYear()) * 12;
+    months += end.getMonth() - start.getMonth();
+    if (end.getDate() < start.getDate()) months -= 1;
+    return Math.max(0, months);
+  }
+
+  const profileRaw = localStorage.getItem('pl_profile');
+
+  if (!profileRaw) {
+    document.getElementById('no-profile').style.display = 'block';
+  } else {
+    const profile = JSON.parse(profileRaw);
+    const birthdate = new Date(profile.birthdate);
+    const today = new Date();
+    const ageMonths = monthsBetween(birthdate, today);
+
+    document.getElementById('calendar-view').style.display = 'block';
+    document.getElementById('child-name-display').textContent = profile.name || 'Dziecko';
+    document.getElementById('child-age-display').textContent =
+      ageMonths < 1 ? 'Wiek: poniżej 1 miesiąca' : `Wiek: ${ageMonths} ${ageMonths === 1 ? 'miesiąc' : 'miesięcy'}`;
+
+    const timeline = document.getElementById('timeline');
+
+    stages.forEach((stage, index) => {
+      const stageStart = addMonths(birthdate, stage.month);
+      const nextMonth = index + 1 < stages.length ? stages[index + 1].month : stage.month + 1;
+      const stageEnd = addMonths(birthdate, nextMonth);
+
+      let stateClass = '';
+      let badge = '';
+
+      if (ageMonths >= stage.month && ageMonths < nextMonth) {
+        stateClass = 'current';
+        badge = '<span class="now-badge">Teraz</span>';
+      } else if (ageMonths >= nextMonth) {
+        stateClass = 'past';
+        badge = '<span class="done-badge">&#10003; Za nami</span>';
+      }
+
+      const li = document.createElement('li');
+      li.className = `stage ${stateClass}`;
+      li.innerHTML = `
+        <div class="stage-top">
+          <span class="stage-month">${stage.label}${badge}</span>
+          <span class="stage-dates">${formatDate(stageStart)}</span>
+        </div>
+        <h2 class="display">${stage.title}</h2>
+        <p>${stage.text}</p>
+      `;
+      timeline.appendChild(li);
+    });
+  }
+</script>
+
+</body>
+</html>
