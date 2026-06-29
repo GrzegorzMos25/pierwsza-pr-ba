@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owsianka z gruszką i cynamonem — Pierwsze Łyżeczki</title>
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
 <style>
   :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,43 +42,61 @@
 </head>
 <body>
 <a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
-<header>
-  <span class="eyebrow">Śniadanie · 8+ miesięcy</span>
-  <h1 class="display">Owsianka z gruszką i cynamonem</h1>
-  <p class="subtitle">Rozgrzewające śniadanie z błonnikiem i naturalną słodyczą gruszki.</p>
-  <div class="meta-row">
-    <div class="meta-item"><span class="num">10 min</span><span class="label">Czas</span></div>
-    <div class="meta-item"><span class="num">4</span><span class="label">Składniki</span></div>
-    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
-  </div>
-</header>
-<main>
-  <div class="card">
-    <h2>Składniki</h2>
-    <ul class="ingredients">
-      <li><span class="amount">40 g</span> płatków owsianych górskich, grubo zmielonych</li>
-      <li><span class="amount">150 ml</span> mleka mamy, mleka modyfikowanego lub wody</li>
-      <li><span class="amount">1/2 szt.</span> gruszki, obranej i drobno startej</li>
-      <li><span class="amount">szczypta</span> cynamonu</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Przygotowanie</h2>
-    <ol class="steps">
-      <li>Mleko lub wodę zagotuj w małym garnku na średnim ogniu.</li>
-      <li>Wsyp płatki owsiane, zmniejsz ogień i gotuj ok. 5 minut, mieszając, aż płatki zmiękną.</li>
-      <li>Dodaj startą gruszkę i cynamon, gotuj jeszcze 2 minuty.</li>
-      <li>Zdejmij z ognia, w razie potrzeby rozgnieć widelcem grubsze kawałki.</li>
-      <li>Ostudź do temperatury letniej przed podaniem.</li>
-    </ol>
-  </div>
-  <div class="card safety">
-    <h2>Bezpieczeństwo i wskazówki</h2>
-    <p><strong>Konsystencja:</strong> na tym etapie owsianka może mieć drobne, miękkie grudki — to dobry moment na naukę żucia.</p>
-    <p><strong>Cynamon:</strong> używaj w bardzo małej ilości, jako delikatny aromat, nie główny smak.</p>
-    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
-  </div>
-</main>
+<header id="header"></header>
+<main id="main"></main>
 <footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+<script type="application/json" id="recipe-data">
+{
+  "id": "owsianka-gruszka",
+  "title": "Owsianka z gruszką i cynamonem",
+  "subtitle": "Rozgrzewające śniadanie z błonnikiem i naturalną słodyczą gruszki.",
+  "category": "sniadanie",
+  "min_age_months": 8,
+  "time_minutes": 10,
+  "servings": 1,
+  "consistency": "z_grudkami",
+  "ingredients": [
+    { "id": "platki_owsiane", "name": "Płatki owsiane górskie, grubo zmielone", "amount": 40, "unit": "g", "group": "zboza" },
+    { "id": "mleko_mamy_lub_modyfikowane", "name": "Mleko mamy, mleko modyfikowane lub woda", "amount": 150, "unit": "ml", "group": "inne" },
+    { "id": "gruszka", "name": "Gruszka, obrana i drobno starta", "amount": 0.5, "unit": "szt", "group": "owoce" },
+    { "id": "cynamon", "name": "Cynamon", "amount": 1, "unit": "szczypta", "group": "przyprawy" }
+  ],
+  "allergens": [],
+  "steps": [
+    "Mleko lub wodę zagotuj w małym garnku na średnim ogniu.",
+    "Wsyp płatki owsiane, zmniejsz ogień i gotuj ok. 5 minut, mieszając.",
+    "Dodaj startą gruszkę i cynamon, gotuj jeszcze 2 minuty.",
+    "Zdejmij z ognia, rozgnieć widelcem grubsze kawałki.",
+    "Ostudź do temperatury letniej przed podaniem."
+  ],
+  "safety_notes": [
+    "Owsianka może mieć drobne, miękkie grudki — to dobry moment na naukę żucia.",
+    "Cynamon stosuj w bardzo małej ilości, jako delikatny aromat."
+  ]
+}
+</script>
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>`;
+  const ingredientsHtml = recipe.ingredients.map(i => `<li data-ingredient-id="${i.id}" data-group="${i.group}"><span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}</li>`).join('');
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length) ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+  document.getElementById('main').innerHTML = `
+    <div class="card"><h2>Składniki</h2><ul class="ingredients">${ingredientsHtml}</ul></div>
+    <div class="card"><h2>Przygotowanie</h2><ol class="steps">${stepsHtml}</ol></div>
+    <div class="card safety"><h2>Bezpieczeństwo i wskazówki</h2>${safetyHtml}${allergensHtml}<p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p></div>`;
+</script>
 </body>
 </html>

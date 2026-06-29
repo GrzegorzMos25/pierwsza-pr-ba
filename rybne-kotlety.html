@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rybne kotlety z ziemniakiem — Pierwsze Łyżeczki</title>
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
 <style>
   :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,44 +42,62 @@
 </head>
 <body>
 <a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
-<header>
-  <span class="eyebrow">Kolacja · 9+ miesięcy</span>
-  <h1 class="display">Rybne kotlety z ziemniakiem</h1>
-  <p class="subtitle">Delikatne kotleciki z białej ryby — łatwe do samodzielnego chwytania.</p>
-  <div class="meta-row">
-    <div class="meta-item"><span class="num">20 min</span><span class="label">Czas</span></div>
-    <div class="meta-item"><span class="num">4</span><span class="label">Składniki</span></div>
-    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
-  </div>
-</header>
-<main>
-  <div class="card">
-    <h2>Składniki</h2>
-    <ul class="ingredients">
-      <li><span class="amount">60 g</span> białej ryby bez ości (np. dorsz, mintaj)</li>
-      <li><span class="amount">1 mały</span> ziemniak, ugotowany i przetarty</li>
-      <li><span class="amount">1 łyżka</span> mąki pszennej lub owsianej</li>
-      <li><span class="amount">1 łyżeczka</span> oliwy z oliwek do podsmażenia</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Przygotowanie</h2>
-    <ol class="steps">
-      <li>Rybę gotuj na parze ok. 8–10 minut, do całkowitego ugotowania.</li>
-      <li>Rozgnieć rybę widelcem, dokładnie sprawdzając, czy nie pozostały żadne ości.</li>
-      <li>Połącz rybę z przetartym ziemniakiem i mąką, wymieszaj na jednolitą masę.</li>
-      <li>Uformuj małe kotleciki wielkości kęsa dziecka.</li>
-      <li>Podsmaż na rozgrzanej oliwie ok. 2–3 minuty z każdej strony, do lekkiego zezłocenia.</li>
-      <li>Ostudź do temperatury letniej przed podaniem.</li>
-    </ol>
-  </div>
-  <div class="card safety">
-    <h2>Bezpieczeństwo i wskazówki</h2>
-    <p><strong>Ości:</strong> to najważniejszy krok — dokładnie sprawdź rybę palcami przed i po rozgnieceniu.</p>
-    <p><strong>Wielkość kotletów:</strong> małe, płaskie kotleciki łatwiej dziecku samodzielnie chwycić i pogryzać.</p>
-    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
-  </div>
-</main>
+<header id="header"></header>
+<main id="main"></main>
 <footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+<script type="application/json" id="recipe-data">
+{
+  "id": "rybne-kotlety",
+  "title": "Rybne kotlety z ziemniakiem",
+  "subtitle": "Delikatne kotleciki z białej ryby — łatwe do samodzielnego chwytania.",
+  "category": "kolacja",
+  "min_age_months": 9,
+  "time_minutes": 20,
+  "servings": 1,
+  "consistency": "finger_food",
+  "ingredients": [
+    { "id": "ryba_biala", "name": "Biała ryba bez ości (dorsz, mintaj)", "amount": 60, "unit": "g", "group": "bialko" },
+    { "id": "ziemniak", "name": "Ziemniak, ugotowany i przetarty", "amount": 1, "unit": "szt", "group": "warzywa" },
+    { "id": "maka_pszenna", "name": "Mąka pszenna", "amount": 1, "unit": "lyzka", "group": "zboza" },
+    { "id": "oliwa_z_oliwek", "name": "Oliwa z oliwek do podsmażenia", "amount": 1, "unit": "lyzeczka", "group": "tluszcze" }
+  ],
+  "allergens": ["ryba", "gluten"],
+  "steps": [
+    "Rybę gotuj na parze ok. 8–10 minut, do całkowitego ugotowania.",
+    "Rozgnieć rybę widelcem, dokładnie sprawdzając, czy nie pozostały żadne ości.",
+    "Połącz rybę z przetartym ziemniakiem i mąką, wymieszaj na jednolitą masę.",
+    "Uformuj małe kotleciki wielkości kęsa dziecka.",
+    "Podsmaż na oliwie ok. 2–3 minuty z każdej strony, do lekkiego zezłocenia.",
+    "Ostudź do temperatury letniej przed podaniem."
+  ],
+  "safety_notes": [
+    "To najważniejszy krok — dokładnie sprawdź rybę palcami przed i po rozgnieceniu, szukając ości.",
+    "Małe, płaskie kotleciki łatwiej dziecku samodzielnie chwycić i pogryzać."
+  ]
+}
+</script>
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>`;
+  const ingredientsHtml = recipe.ingredients.map(i => `<li data-ingredient-id="${i.id}" data-group="${i.group}"><span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}</li>`).join('');
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length) ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+  document.getElementById('main').innerHTML = `
+    <div class="card"><h2>Składniki</h2><ul class="ingredients">${ingredientsHtml}</ul></div>
+    <div class="card"><h2>Przygotowanie</h2><ol class="steps">${stepsHtml}</ol></div>
+    <div class="card safety"><h2>Bezpieczeństwo i wskazówki</h2>${safetyHtml}${allergensHtml}<p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p></div>`;
+</script>
 </body>
 </html>

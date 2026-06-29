@@ -3,154 +3,293 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tworzenie przepisów</title>
-
+<title>Dopasuj przepis — Pierwsze Łyżeczki</title>
 <style>
-body{
-    font-family: Arial,sans-serif;
-    max-width:1000px;
-    margin:auto;
-    padding:20px;
-}
+  :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; --warn:#C2542E; --warn-soft:#FBE7DE; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.6; }
+  .display { font-family:Georgia,'Iowan Old Style',serif; }
+  .back-link { display:block; max-width:900px; margin:24px auto 0; padding:0 24px; font-size:14px; color:var(--leaf); text-decoration:none; }
+  .back-link:hover { text-decoration:underline; }
+  header { padding:24px 24px 16px; max-width:900px; margin:0 auto; text-align:center; }
+  .eyebrow { display:inline-block; background:var(--pumpkin-soft); color:var(--pumpkin); font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px; margin-bottom:20px; }
+  h1 { font-size:38px; font-weight:700; color:var(--leaf); margin-bottom:12px; letter-spacing:-0.01em; }
+  .subtitle { font-size:16px; color:#5C6B5F; max-width:560px; margin:0 auto; }
+  main { max-width:900px; margin:0 auto; padding:24px 24px 80px; }
 
-h1{
-    margin-bottom:20px;
-}
+  .step-label {
+    font-size:13px; font-weight:700; color:var(--leaf); text-transform:uppercase;
+    letter-spacing:0.05em; margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .step-label .num {
+    background:var(--leaf); color:white; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
 
-.section{
-    margin-bottom:30px;
-}
+  .card { background:white; border:1px solid var(--line); border-radius:18px; padding:28px; margin-bottom:24px; }
 
-.ingredients{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-    gap:8px;
-}
+  .chip-grid { display:flex; flex-wrap:wrap; gap:10px; }
+  .chip {
+    border:1px solid var(--line); border-radius:100px; padding:9px 16px;
+    font-size:14px; cursor:pointer; background:var(--paper); user-select:none;
+    transition: all 0.15s ease;
+  }
+  .chip.allergen-chip.active {
+    background:var(--warn); border-color:var(--warn); color:white;
+  }
+  .chip.ingredient-chip.active {
+    background:var(--leaf); border-color:var(--leaf); color:white;
+  }
+  .chip:hover { border-color:var(--pumpkin); }
 
-.recipe{
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:10px;
-}
-button{
-    padding:12px 20px;
-    cursor:pointer;
-}
+  .group-block { margin-bottom:18px; }
+  .group-block:last-child { margin-bottom:0; }
+  .group-title { font-size:12px; color:#9AA59A; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; }
+
+  .results-summary {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px; flex-wrap:wrap; gap:8px;
+  }
+  .results-summary h2 { font-size:20px; color:var(--leaf); }
+  .results-count { font-size:13px; color:#9AA59A; }
+
+  .recipe-result {
+    background:white; border:1px solid var(--line); border-radius:16px;
+    padding:22px 26px; margin-bottom:14px; display:flex; justify-content:space-between;
+    align-items:center; flex-wrap:wrap; gap:12px;
+  }
+  .recipe-result.full-match { border-color:var(--leaf); }
+  .recipe-result.partial-match { opacity:0.7; }
+
+  .recipe-result h3 { font-size:17px; color:var(--ink); margin-bottom:4px; }
+  .recipe-result .meta { font-size:13px; color:#9AA59A; }
+  .match-badge {
+    font-size:12px; font-weight:700; padding:5px 12px; border-radius:100px;
+  }
+  .match-badge.full { background:var(--leaf-soft); color:var(--leaf); }
+  .match-badge.partial { background:var(--pumpkin-soft); color:var(--pumpkin); }
+
+  .missing-list { font-size:12px; color:var(--warn); margin-top:4px; }
+
+  .empty-state {
+    text-align:center; padding:48px 24px; color:#9AA59A; font-size:14px;
+  }
+
+  .recipe-result a.view-link {
+    font-size:13px; font-weight:700; color:var(--pumpkin); text-decoration:none;
+  }
+
+  .loading { text-align:center; padding:40px; color:#9AA59A; font-size:14px; }
+
+  footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
+
+  @media (max-width:600px) {
+    h1 { font-size:30px; }
+    .card { padding:20px; }
+  }
 </style>
-
 </head>
 <body>
 
-<h1>Tworzenie przepisów</h1>
+<a class="back-link" href="index.html">&larr; Strona główna</a>
 
-<div class="section">
-<h2>Alergeny</h2>
+<header>
+  <span class="eyebrow">Dopasowywanie przepisów</span>
+  <h1 class="display">Co mam, co ugotuję?</h1>
+  <p class="subtitle">Wybierz alergeny do wykluczenia i produkty, które masz pod ręką — pokażemy przepisy, które da się z nich zrobić.</p>
+</header>
 
-<label><input type="checkbox" value="gluten"> Gluten</label><br>
-<label><input type="checkbox" value="jajo"> Jajo</label><br>
-<label><input type="checkbox" value="ryba"> Ryba</label><br>
-<label><input type="checkbox" value="mleko_krowie"> Mleko</label><br>
-</div>
+<main>
 
-<div class="section">
-<h2>Składniki</h2>
+  <div class="card">
+    <div class="step-label"><span class="num">1</span> Alergeny do wykluczenia</div>
+    <div class="chip-grid" id="allergen-chips"></div>
+  </div>
 
-<div class="ingredients">
+  <div class="card">
+    <div class="step-label"><span class="num">2</span> Produkty, które masz / dziecko już jadło</div>
+    <div id="ingredient-groups"></div>
+  </div>
 
-<label><input type="checkbox" value="dynia"> Dynia</label>
-<label><input type="checkbox" value="jablko"> Jabłko</label>
-<label><input type="checkbox" value="gruszka"> Gruszka</label>
-<label><input type="checkbox" value="brokul"> Brokuł</label>
-<label><input type="checkbox" value="batat"> Batat</label>
-<label><input type="checkbox" value="filet_z_kurczaka"> Kurczak</label>
+  <div class="results-summary">
+    <h2 class="display">Dopasowane przepisy</h2>
+    <span class="results-count" id="results-count"></span>
+  </div>
 
-</div>
-</div>
+  <div id="results"></div>
 
-<button onclick="szukajPrzepisow()">
-Znajdź przepisy
-</button>
+</main>
 
-<hr>
-
-<div id="wyniki"></div>
+<footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
 
 <script>
+  const allergenLabels = {
+    gluten: "Gluten", jajo: "Jajo", ryba: "Ryba", mleko_krowie: "Mleko krowie",
+    orzechy_arachidowe: "Orzeszki arachidowe", orzechy_inne: "Inne orzechy",
+    soja: "Soja", seler: "Seler"
+  };
+  const groupLabels = {
+    warzywa: "Warzywa", owoce: "Owoce", zboza: "Zboża", bialko: "Białko",
+    nabial: "Nabiał", tluszcze: "Tłuszcze", straczki: "Strączki", przyprawy: "Przyprawy", inne: "Inne"
+  };
 
-const przepisy = [
+  let dictionary = null;
+  let recipeFiles = [];
+  let recipes = []; // { data, file }
+  const selectedAllergens = new Set();
+  const selectedIngredients = new Set();
 
-{
-name:"Puree z dyni",
-url:"puree-z-dyni.html",
-ingredients:["dynia"]
-},
+  async function init() {
+    const [dictRes, indexRes] = await Promise.all([
+      fetch('slownik-skladnikow.json').then(r => r.json()),
+      fetch('recipes-index.json').then(r => r.json())
+    ]);
+    dictionary = dictRes;
+    recipeFiles = indexRes;
 
-{
-name:"Puree z jabłka",
-url:"puree-z-jablka.html",
-ingredients:["jablko"]
-},
+    renderAllergenChips();
+    renderIngredientGroups();
+    await loadRecipes();
+    renderResults();
+  }
 
-{
-name:"Owsianka z gruszką",
-url:"owsianka-gruszka.html",
-ingredients:["gruszka"]
-},
+  function renderAllergenChips() {
+    const container = document.getElementById('allergen-chips');
+    dictionary.allergens.forEach(a => {
+      const chip = document.createElement('div');
+      chip.className = 'chip allergen-chip';
+      chip.textContent = allergenLabels[a] || a;
+      chip.addEventListener('click', () => {
+        if (selectedAllergens.has(a)) { selectedAllergens.delete(a); chip.classList.remove('active'); }
+        else { selectedAllergens.add(a); chip.classList.add('active'); }
+        renderResults();
+      });
+      container.appendChild(chip);
+    });
+  }
 
-{
-name:"Kurczak z batatami i brokułem",
-url:"kurczak-bataty-brokul.html",
-ingredients:["filet_z_kurczaka","batat","brokul"]
-}
+  function renderIngredientGroups() {
+    const container = document.getElementById('ingredient-groups');
+    const byGroup = {};
+    dictionary.ingredients.forEach(ing => {
+      if (!byGroup[ing.group]) byGroup[ing.group] = [];
+      byGroup[ing.group].push(ing);
+    });
 
-];
+    Object.keys(byGroup).forEach(group => {
+      const block = document.createElement('div');
+      block.className = 'group-block';
+      const title = document.createElement('div');
+      title.className = 'group-title';
+      title.textContent = groupLabels[group] || group;
+      block.appendChild(title);
 
-function szukajPrzepisow(){
+      const grid = document.createElement('div');
+      grid.className = 'chip-grid';
 
-const wybrane = [];
+      byGroup[group].forEach(ing => {
+        const chip = document.createElement('div');
+        chip.className = 'chip ingredient-chip';
+        chip.textContent = ing.name;
+        chip.addEventListener('click', () => {
+          if (selectedIngredients.has(ing.id)) { selectedIngredients.delete(ing.id); chip.classList.remove('active'); }
+          else { selectedIngredients.add(ing.id); chip.classList.add('active'); }
+          renderResults();
+        });
+        grid.appendChild(chip);
+      });
 
-document
-.querySelectorAll('.ingredients input:checked')
-.forEach(el => {
-    wybrane.push(el.value);
-});
+      block.appendChild(grid);
+      container.appendChild(block);
+    });
+  }
 
-const wyniki = document.getElementById('wyniki');
+  async function loadRecipes() {
+    const resultsEl = document.getElementById('results');
+    resultsEl.innerHTML = '<div class="loading">Wczytywanie przepisów...</div>';
 
-wyniki.innerHTML='';
+    const loaded = await Promise.all(recipeFiles.map(async file => {
+      try {
+        const res = await fetch(file);
+        const html = await res.text();
+        const match = html.match(/<script type="application\/json" id="recipe-data">([\s\S]*?)<\/script>/);
+        if (!match) return null;
+        const data = JSON.parse(match[1]);
+        return { data, file };
+      } catch (e) {
+        return null;
+      }
+    }));
 
-const znalezione = przepisy.filter(przepis => {
+    recipes = loaded.filter(r => r !== null);
+  }
 
-return wybrane.every(skladnik =>
-przepis.ingredients.includes(skladnik)
-);
+  function renderResults() {
+    const resultsEl = document.getElementById('results');
+    const countEl = document.getElementById('results-count');
+    resultsEl.innerHTML = '';
 
-});
+    const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
 
-if(znalezione.length===0){
+    // Wyklucz przepisy z wybranymi alergenami
+    const safeRecipes = recipes.filter(r => {
+      const allergens = r.data.allergens || [];
+      return !allergens.some(a => selectedAllergens.has(a));
+    });
 
-wyniki.innerHTML=
-'<p>Nie znaleziono przepisów.</p>';
+    const scored = safeRecipes.map(r => {
+      const required = r.data.ingredients.filter(i => !i.optional);
+      const have = required.filter(i => selectedIngredients.has(i.id));
+      const missing = required.filter(i => !selectedIngredients.has(i.id));
+      const isFullMatch = missing.length === 0 && selectedIngredients.size > 0;
+      return { ...r, have, missing, isFullMatch, requiredCount: required.length };
+    });
 
-return;
-}
+    // Sortuj: pełne dopasowania najpierw, potem po liczbie brakujących składników
+    scored.sort((a, b) => {
+      if (a.isFullMatch && !b.isFullMatch) return -1;
+      if (!a.isFullMatch && b.isFullMatch) return 1;
+      return a.missing.length - b.missing.length;
+    });
 
-znalezione.forEach(przepis => {
+    if (selectedIngredients.size === 0) {
+      resultsEl.innerHTML = '<div class="empty-state">Wybierz przynajmniej jeden produkt, żeby zobaczyć dopasowane przepisy.</div>';
+      countEl.textContent = '';
+      return;
+    }
 
-wyniki.innerHTML += `
-<div class="recipe">
-<h3>${przepis.name}</h3>
-<a href="${przepis.url}">
-Otwórz przepis
-</a>
-</div>
-`;
+    const fullCount = scored.filter(r => r.isFullMatch).length;
+    countEl.textContent = `${fullCount} z ${recipes.length} przepisów da się zrobić od razu`;
 
-});
+    if (scored.length === 0) {
+      resultsEl.innerHTML = '<div class="empty-state">Żaden przepis nie spełnia wybranych warunków (alergeny).</div>';
+      return;
+    }
 
-}
+    scored.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'recipe-result ' + (r.isFullMatch ? 'full-match' : 'partial-match');
 
+      const missingText = r.missing.length
+        ? `<div class="missing-list">Brakuje: ${r.missing.map(i => i.name).join(', ')}</div>`
+        : '';
+
+      div.innerHTML = `
+        <div>
+          <h3 class="display">${r.data.title}</h3>
+          <div class="meta">${categoryLabels[r.data.category] || r.data.category} · ${r.data.min_age_months}+ mcy · ${r.data.time_minutes} min</div>
+          ${missingText}
+        </div>
+        <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+          <span class="match-badge ${r.isFullMatch ? 'full' : 'partial'}">${r.isFullMatch ? 'Masz wszystko' : (r.requiredCount - r.missing.length) + '/' + r.requiredCount + ' składników'}</span>
+          <a class="view-link" href="${r.file}">Zobacz przepis &rarr;</a>
+        </div>
+      `;
+      resultsEl.appendChild(div);
+    });
+  }
+
+  init();
 </script>
 
 </body>

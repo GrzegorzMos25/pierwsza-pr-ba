@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kurczak z batatami i brokułem — Pierwsze Łyżeczki</title>
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
 <style>
   :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,43 +42,61 @@
 </head>
 <body>
 <a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
-<header>
-  <span class="eyebrow">Obiad · 9+ miesięcy</span>
-  <h1 class="display">Kurczak z batatami i brokułem</h1>
-  <p class="subtitle">Pełnowartościowy obiad z białkiem, warzywami i odrobiną zdrowego tłuszczu.</p>
-  <div class="meta-row">
-    <div class="meta-item"><span class="num">25 min</span><span class="label">Czas</span></div>
-    <div class="meta-item"><span class="num">4</span><span class="label">Składniki</span></div>
-    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
-  </div>
-</header>
-<main>
-  <div class="card">
-    <h2>Składniki</h2>
-    <ul class="ingredients">
-      <li><span class="amount">60 g</span> filetu z kurczaka, pokrojonego w małą kostkę</li>
-      <li><span class="amount">80 g</span> batata, obranego i pokrojonego w kostkę</li>
-      <li><span class="amount">50 g</span> brokułu, podzielonego na małe różyczki</li>
-      <li><span class="amount">1 łyżeczka</span> oliwy z oliwek</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Przygotowanie</h2>
-    <ol class="steps">
-      <li>Kurczaka gotuj na parze lub w niewielkiej ilości wody ok. 15–18 minut, do całkowitego ugotowania w środku.</li>
-      <li>Równolegle ugotuj batata i brokuł na parze ok. 12–15 minut, do miękkości.</li>
-      <li>Połącz kurczaka, batata i brokuł w jednej misce.</li>
-      <li>Rozgnieć widelcem na drobne kawałki — nie na gładkie puree, drobne grudki uczą żucia.</li>
-      <li>Dodaj oliwę z oliwek, wymieszaj i ostudź do temperatury letniej przed podaniem.</li>
-    </ol>
-  </div>
-  <div class="card safety">
-    <h2>Bezpieczeństwo i wskazówki</h2>
-    <p><strong>Kurczak:</strong> upewnij się, że mięso jest ugotowane w środku na wskroś — bez różowego koloru.</p>
-    <p><strong>Konsystencja:</strong> na tym etapie dziecko może jeść drobne kawałki — unikaj jednak dużych, twardych kęsów brokułu.</p>
-    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
-  </div>
-</main>
+<header id="header"></header>
+<main id="main"></main>
 <footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+<script type="application/json" id="recipe-data">
+{
+  "id": "kurczak-bataty-brokul",
+  "title": "Kurczak z batatami i brokułem",
+  "subtitle": "Pełnowartościowy obiad z białkiem, warzywami i odrobiną zdrowego tłuszczu.",
+  "category": "obiad",
+  "min_age_months": 9,
+  "time_minutes": 25,
+  "servings": 1,
+  "consistency": "z_grudkami",
+  "ingredients": [
+    { "id": "filet_z_kurczaka", "name": "Filet z kurczaka, pokrojony w małą kostkę", "amount": 60, "unit": "g", "group": "bialko" },
+    { "id": "batat", "name": "Batat, obrany i pokrojony w kostkę", "amount": 80, "unit": "g", "group": "warzywa" },
+    { "id": "brokul", "name": "Brokuł, podzielony na małe różyczki", "amount": 50, "unit": "g", "group": "warzywa" },
+    { "id": "oliwa_z_oliwek", "name": "Oliwa z oliwek", "amount": 1, "unit": "lyzeczka", "group": "tluszcze" }
+  ],
+  "allergens": [],
+  "steps": [
+    "Kurczaka gotuj na parze lub w wodzie ok. 15–18 minut, do całkowitego ugotowania.",
+    "Równolegle ugotuj batata i brokuł na parze ok. 12–15 minut, do miękkości.",
+    "Połącz kurczaka, batata i brokuł w jednej misce.",
+    "Rozgnieć widelcem na drobne kawałki — nie na gładkie puree.",
+    "Dodaj oliwę z oliwek, wymieszaj i ostudź do temperatury letniej."
+  ],
+  "safety_notes": [
+    "Upewnij się, że kurczak jest ugotowany w środku na wskroś — bez różowego koloru.",
+    "Unikaj dużych, twardych kęsów brokułu."
+  ]
+}
+</script>
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>`;
+  const ingredientsHtml = recipe.ingredients.map(i => `<li data-ingredient-id="${i.id}" data-group="${i.group}"><span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}</li>`).join('');
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length) ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+  document.getElementById('main').innerHTML = `
+    <div class="card"><h2>Składniki</h2><ul class="ingredients">${ingredientsHtml}</ul></div>
+    <div class="card"><h2>Przygotowanie</h2><ol class="steps">${stepsHtml}</ol></div>
+    <div class="card safety"><h2>Bezpieczeństwo i wskazówki</h2>${safetyHtml}${allergensHtml}<p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p></div>`;
+</script>
 </body>
 </html>

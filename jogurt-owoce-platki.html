@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jogurt z owocami i płatkami owsianymi — Pierwsze Łyżeczki</title>
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
 <style>
   :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,41 +42,59 @@
 </head>
 <body>
 <a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
-<header>
-  <span class="eyebrow">Przekąska · 8+ miesięcy</span>
-  <h1 class="display">Jogurt z owocami i płatkami owsianymi</h1>
-  <p class="subtitle">Szybka, kremowa przekąska bogata w wapń i błonnik.</p>
-  <div class="meta-row">
-    <div class="meta-item"><span class="num">5 min</span><span class="label">Czas</span></div>
-    <div class="meta-item"><span class="num">3</span><span class="label">Składniki</span></div>
-    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
-  </div>
-</header>
-<main>
-  <div class="card">
-    <h2>Składniki</h2>
-    <ul class="ingredients">
-      <li><span class="amount">100 g</span> jogurtu naturalnego, bez dodatku cukru</li>
-      <li><span class="amount">1/2 szt.</span> banana, dobrze rozgniecionego</li>
-      <li><span class="amount">1 łyżka</span> płatków owsianych, zmielonych</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Przygotowanie</h2>
-    <ol class="steps">
-      <li>Rozgnieć banana widelcem na gładką masę.</li>
-      <li>Wymieszaj jogurt z rozgniecionym bananem.</li>
-      <li>Dodaj zmielone płatki owsiane i ponownie wymieszaj.</li>
-      <li>Podawaj od razu po przygotowaniu.</li>
-    </ol>
-  </div>
-  <div class="card safety">
-    <h2>Bezpieczeństwo i wskazówki</h2>
-    <p><strong>Jogurt:</strong> wybieraj wyłącznie naturalny, bez dodatku cukru i bez owocowych dodatków przemysłowych.</p>
-    <p><strong>Banan:</strong> upewnij się, że jest dobrze rozgniecony, bez większych kawałków.</p>
-    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
-  </div>
-</main>
+<header id="header"></header>
+<main id="main"></main>
 <footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+<script type="application/json" id="recipe-data">
+{
+  "id": "jogurt-owoce-platki",
+  "title": "Jogurt z owocami i płatkami owsianymi",
+  "subtitle": "Szybka, kremowa przekąska bogata w wapń i błonnik.",
+  "category": "przekaska",
+  "min_age_months": 8,
+  "time_minutes": 5,
+  "servings": 1,
+  "consistency": "gladkie",
+  "ingredients": [
+    { "id": "jogurt_naturalny", "name": "Jogurt naturalny, bez dodatku cukru", "amount": 100, "unit": "g", "group": "nabial" },
+    { "id": "banan", "name": "Banan, dobrze rozgnieciony", "amount": 0.5, "unit": "szt", "group": "owoce" },
+    { "id": "platki_owsiane", "name": "Płatki owsiane, zmielone", "amount": 1, "unit": "lyzka", "group": "zboza" }
+  ],
+  "allergens": ["mleko_krowie"],
+  "steps": [
+    "Rozgnieć banana widelcem na gładką masę.",
+    "Wymieszaj jogurt z rozgniecionym bananem.",
+    "Dodaj zmielone płatki owsiane i ponownie wymieszaj.",
+    "Podawaj od razu po przygotowaniu."
+  ],
+  "safety_notes": [
+    "Wybieraj wyłącznie jogurt naturalny, bez dodatku cukru i owocowych dodatków przemysłowych.",
+    "Upewnij się, że banan jest dobrze rozgnieciony, bez większych kawałków."
+  ]
+}
+</script>
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>`;
+  const ingredientsHtml = recipe.ingredients.map(i => `<li data-ingredient-id="${i.id}" data-group="${i.group}"><span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}</li>`).join('');
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length) ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+  document.getElementById('main').innerHTML = `
+    <div class="card"><h2>Składniki</h2><ul class="ingredients">${ingredientsHtml}</ul></div>
+    <div class="card"><h2>Przygotowanie</h2><ol class="steps">${stepsHtml}</ol></div>
+    <div class="card safety"><h2>Bezpieczeństwo i wskazówki</h2>${safetyHtml}${allergensHtml}<p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p></div>`;
+</script>
 </body>
 </html>

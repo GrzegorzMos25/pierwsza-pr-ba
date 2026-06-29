@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Słupki warzywne na parze — Pierwsze Łyżeczki</title>
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
 <style>
   :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,40 +42,58 @@
 </head>
 <body>
 <a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
-<header>
-  <span class="eyebrow">Przekąska · 8+ miesięcy</span>
-  <h1 class="display">Słupki warzywne na parze</h1>
-  <p class="subtitle">Prosty finger food do samodzielnego chwytania i ćwiczenia gryzienia.</p>
-  <div class="meta-row">
-    <div class="meta-item"><span class="num">12 min</span><span class="label">Czas</span></div>
-    <div class="meta-item"><span class="num">2</span><span class="label">Składniki</span></div>
-    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
-  </div>
-</header>
-<main>
-  <div class="card">
-    <h2>Składniki</h2>
-    <ul class="ingredients">
-      <li><span class="amount">1 mała</span> marchewka, obrana</li>
-      <li><span class="amount">80 g</span> cukinii</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>Przygotowanie</h2>
-    <ol class="steps">
-      <li>Warzywa umyj, obierz marchewkę i pokrój oba warzywa w słupki wielkości i grubości palca dziecka.</li>
-      <li>Gotuj na parze ok. 8–10 minut, do miękkości.</li>
-      <li>Sprawdź konsystencję — słupek powinien się łatwo rozgnieść między palcami, ale nie rozpadać.</li>
-      <li>Ostudź do temperatury pokojowej przed podaniem.</li>
-    </ol>
-  </div>
-  <div class="card safety">
-    <h2>Bezpieczeństwo i wskazówki</h2>
-    <p><strong>Nadzór:</strong> zawsze obserwuj dziecko podczas jedzenia finger food i upewnij się, że siedzi w stabilnej pozycji.</p>
-    <p><strong>Konsystencja:</strong> słupek musi być na tyle miękki, by rozgniatał się dziąsłami — jeśli jest twardy, gotuj dłużej.</p>
-    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
-  </div>
-</main>
+<header id="header"></header>
+<main id="main"></main>
 <footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+<script type="application/json" id="recipe-data">
+{
+  "id": "slupki-warzywne",
+  "title": "Słupki warzywne na parze",
+  "subtitle": "Prosty finger food do samodzielnego chwytania i ćwiczenia gryzienia.",
+  "category": "przekaska",
+  "min_age_months": 8,
+  "time_minutes": 12,
+  "servings": 1,
+  "consistency": "finger_food",
+  "ingredients": [
+    { "id": "marchew", "name": "Marchewka, obrana", "amount": 1, "unit": "szt", "group": "warzywa" },
+    { "id": "cukinia", "name": "Cukinia", "amount": 80, "unit": "g", "group": "warzywa" }
+  ],
+  "allergens": [],
+  "steps": [
+    "Warzywa umyj, obierz marchewkę i pokrój oba warzywa w słupki wielkości palca dziecka.",
+    "Gotuj na parze ok. 8–10 minut, do miękkości.",
+    "Sprawdź konsystencję — słupek powinien się łatwo rozgnieść między palcami, ale nie rozpadać.",
+    "Ostudź do temperatury pokojowej przed podaniem."
+  ],
+  "safety_notes": [
+    "Zawsze obserwuj dziecko podczas jedzenia finger food i upewnij się, że siedzi w stabilnej pozycji.",
+    "Słupek musi być na tyle miękki, by rozgniatał się dziąsłami — jeśli jest twardy, gotuj dłużej."
+  ]
+}
+</script>
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>`;
+  const ingredientsHtml = recipe.ingredients.map(i => `<li data-ingredient-id="${i.id}" data-group="${i.group}"><span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}</li>`).join('');
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length) ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+  document.getElementById('main').innerHTML = `
+    <div class="card"><h2>Składniki</h2><ul class="ingredients">${ingredientsHtml}</ul></div>
+    <div class="card"><h2>Przygotowanie</h2><ol class="steps">${stepsHtml}</ol></div>
+    <div class="card safety"><h2>Bezpieczeństwo i wskazówki</h2>${safetyHtml}${allergensHtml}<p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p></div>`;
+</script>
 </body>
 </html>
