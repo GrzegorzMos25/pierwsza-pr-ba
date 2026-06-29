@@ -157,6 +157,7 @@
     if (!raw) return null;
     const p = JSON.parse(raw);
     p.allergens = p.allergens || [];
+    p.otherAllergenIngredients = p.otherAllergenIngredients || [];
     p.cannotEat = p.cannotEat || [];
     p.dislikes = p.dislikes || [];
     p.likes = p.likes || [];
@@ -212,9 +213,12 @@
       grid.className = 'chip-grid';
 
       byGroup[group].forEach(ing => {
-        const cannotEat = profile && profile.cannotEat.includes(ing.id);
+        const cannotEat = profile && (profile.cannotEat.includes(ing.id) || profile.otherAllergenIngredients.includes(ing.id));
+        const blockedByAllergen = profile && ing.allergen && profile.allergens.includes(ing.allergen);
         const liked = profile && profile.likes.includes(ing.id);
         const toIntroduce = profile && profile.wantsToIntroduce.includes(ing.id);
+
+        if (blockedByAllergen) return;
 
         const chip = document.createElement('div');
         let cls = 'chip ingredient-chip';
@@ -263,7 +267,7 @@
     resultsEl.innerHTML = '';
 
     const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
-    const cannotEat = profile ? profile.cannotEat : [];
+    const cannotEat = profile ? [...profile.cannotEat, ...profile.otherAllergenIngredients] : [];
     const dislikes = profile ? profile.dislikes : [];
     const wantsToIntroduce = profile ? profile.wantsToIntroduce : [];
 

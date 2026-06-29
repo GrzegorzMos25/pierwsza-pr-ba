@@ -15,7 +15,7 @@
   .eyebrow { display:inline-block; background:var(--pumpkin-soft); color:var(--pumpkin); font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px; margin-bottom:20px; }
   h1 { font-size:36px; font-weight:700; color:var(--leaf); margin-bottom:12px; letter-spacing:-0.01em; }
   .subtitle { font-size:16px; color:#5C6B5F; max-width:480px; margin:0 auto; }
-  main { max-width:760px; margin:0 auto; padding:0 24px 80px; }
+  main { max-width:760px; margin:0 auto; padding:0 24px 100px; }
 
   .tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
   .tab-btn {
@@ -35,6 +35,7 @@
     width:100%; padding:14px 16px; border:1px solid var(--line); border-radius:10px;
     font-size:16px; font-family:inherit; color:var(--ink); background:var(--paper);
   }
+  input::placeholder { color:#A9B3A5; }
   input:focus { outline:none; border-color:var(--pumpkin); }
 
   .panel-intro { font-size:14px; color:#6B786D; margin-bottom:18px; }
@@ -45,25 +46,53 @@
     font-size:14px; cursor:pointer; background:var(--paper); user-select:none;
   }
   .chip:hover { border-color:var(--pumpkin); }
-
   .chip.active.tone-warn { background:var(--warn); border-color:var(--warn); color:white; }
   .chip.active.tone-leaf { background:var(--leaf); border-color:var(--leaf); color:white; }
   .chip.active.tone-pumpkin { background:var(--pumpkin); border-color:var(--pumpkin); color:white; }
+  .chip.selected-chip { background:var(--leaf-soft); border-color:var(--leaf); }
+  .chip.selected-chip::after { content:" ✕"; font-size:11px; color:var(--leaf); }
 
   .group-block { margin-bottom:18px; }
   .group-block:last-child { margin-bottom:0; }
   .group-title { font-size:12px; color:#9AA59A; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; }
 
+  .selected-row { margin-bottom:22px; padding-bottom:18px; border-bottom:1px dashed var(--line); }
+  .selected-row .group-title { color:var(--leaf); font-weight:700; }
+  .empty-hint { font-size:13px; color:#9AA59A; font-style:italic; }
+
+  .other-allergen-box { margin-top:18px; padding-top:18px; border-top:1px dashed var(--line); }
+  .search-input-wrap { position:relative; margin-bottom:10px; }
+  #other-allergen-search {
+    width:100%; padding:12px 16px; border:1px solid var(--line); border-radius:10px;
+    font-size:15px; font-family:inherit; background:var(--paper);
+  }
+  .suggestions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .suggestion-chip {
+    border:1px dashed var(--pumpkin); color:var(--pumpkin); border-radius:100px;
+    padding:7px 14px; font-size:13px; cursor:pointer; background:white;
+  }
+  .suggestion-chip:hover { background:var(--pumpkin-soft); }
+
+  .nav-buttons { display:flex; justify-content:flex-end; margin-top:8px; }
+  .next-btn {
+    background:white; border:1px solid var(--leaf); color:var(--leaf); font-weight:700;
+    padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; font-family:inherit;
+  }
+  .next-btn:hover { background:var(--leaf-soft); }
+
+  .save-bar { position:sticky; bottom:0; background:var(--paper); padding-top:16px; }
   button.save-btn {
     width:100%; padding:16px; background:var(--leaf); color:white; border:none;
     border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;
   }
   button.save-btn:hover { background:#324739; }
 
-  .confirmation {
-    display:none; margin-top:16px; padding:14px 20px; background:var(--leaf-soft);
-    border-radius:10px; font-size:14px; color:var(--leaf); text-align:center;
+  .toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--leaf); color:white; padding:12px 24px; border-radius:100px;
+    font-size:14px; font-weight:600; opacity:0; transition:all 0.25s ease; pointer-events:none;
   }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
 
@@ -87,8 +116,8 @@
 <main>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="podstawowe">Podstawowe</button>
-    <button class="tab-btn" data-tab="alergeny">Alergeny</button>
+    <button class="tab-btn active" data-tab="podstawowe">1. Podstawowe</button>
+    <button class="tab-btn" data-tab="alergeny">2. Alergeny</button>
     <button class="tab-btn" data-tab="nie-moze">Nie może jeść</button>
     <button class="tab-btn" data-tab="nie-lubi">Nie lubi</button>
     <button class="tab-btn" data-tab="lubi">Lubi</button>
@@ -99,19 +128,31 @@
     <div class="card">
       <div class="field">
         <label for="child-name">Imię dziecka</label>
-        <input type="text" id="child-name" placeholder="np. Zosia">
+        <input type="text" id="child-name" placeholder="np. Zosia" autocomplete="off">
       </div>
       <div class="field">
         <label for="child-birthdate">Data urodzenia</label>
         <input type="date" id="child-birthdate">
       </div>
+      <div class="nav-buttons"><button class="next-btn" data-next="alergeny">Dalej &rarr;</button></div>
     </div>
   </div>
 
   <div class="panel" id="panel-alergeny">
     <div class="card">
-      <p class="panel-intro">Przepisy zawierające wybrane alergeny <strong>nigdy nie będą proponowane</strong> w wyszukiwarce przepisów.</p>
+      <p class="panel-intro">Przepisy zawierające wybrane alergeny <strong>nigdy nie będą proponowane</strong>, a produkty z tymi alergenami nie pojawią się już w kolejnych zakładkach.</p>
       <div class="chip-grid" id="allergen-chips"></div>
+
+      <div class="other-allergen-box">
+        <label>Inne (produkt, na który dziecko reaguje, ale nie jest na liście)</label>
+        <div class="search-input-wrap">
+          <input type="text" id="other-allergen-search" placeholder="Zacznij pisać, np. Jaj...">
+        </div>
+        <div class="chip-grid" id="other-allergen-selected"></div>
+        <div class="suggestions" id="other-allergen-suggestions"></div>
+      </div>
+
+      <div class="nav-buttons"><button class="next-btn" data-next="nie-moze">Dalej &rarr;</button></div>
     </div>
   </div>
 
@@ -119,6 +160,7 @@
     <div class="card">
       <p class="panel-intro">Produkty, których dziecko nie może jeść (np. z innych powodów niż alergia). Przepisy z tymi produktami będą całkowicie wykluczone.</p>
       <div id="cannotEat-groups"></div>
+      <div class="nav-buttons"><button class="next-btn" data-next="nie-lubi">Dalej &rarr;</button></div>
     </div>
   </div>
 
@@ -126,6 +168,7 @@
     <div class="card">
       <p class="panel-intro">Produkty, których dziecko nie lubi. Przepisy z nimi wciąż się pojawią, ale zobaczysz przy nich ostrzeżenie.</p>
       <div id="dislikes-groups"></div>
+      <div class="nav-buttons"><button class="next-btn" data-next="lubi">Dalej &rarr;</button></div>
     </div>
   </div>
 
@@ -133,6 +176,7 @@
     <div class="card">
       <p class="panel-intro">Produkty, które dziecko lubi. Będziemy je oznaczać w wyszukiwarce przepisów.</p>
       <div id="likes-groups"></div>
+      <div class="nav-buttons"><button class="next-btn" data-next="wprowadzic">Dalej &rarr;</button></div>
     </div>
   </div>
 
@@ -143,10 +187,13 @@
     </div>
   </div>
 
-  <button class="save-btn" id="save-btn">Zapisz profil</button>
-  <div class="confirmation" id="confirmation">Profil zapisany.</div>
+  <div class="save-bar">
+    <button class="save-btn" id="save-btn">Zapisz profil</button>
+  </div>
 
 </main>
+
+<div class="toast" id="toast">Profil zapisany ✓</div>
 
 <footer>Dane zapisywane są tylko w tej przeglądarce, na tym urządzeniu.</footer>
 
@@ -161,59 +208,162 @@
     nabial: "Nabiał", tluszcze: "Tłuszcze", straczki: "Strączki", przyprawy: "Przyprawy", inne: "Inne"
   };
 
-  // Przełączanie zakładek
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
-    });
-  });
-
+  let dictionary = null;
   const nameInput = document.getElementById('child-name');
   const birthdateInput = document.getElementById('child-birthdate');
 
   const selections = {
     allergens: new Set(),
+    otherAllergenIngredients: new Set(),
     cannotEat: new Set(),
     dislikes: new Set(),
     likes: new Set(),
     wantsToIntroduce: new Set()
   };
 
+  // --- Zakładki ---
+  function activateTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tabName));
+  }
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+  });
+  document.querySelectorAll('.next-btn').forEach(btn => {
+    btn.addEventListener('click', () => activateTab(btn.dataset.next));
+  });
+
+  // --- Wczytanie istniejącego profilu ---
   function loadExistingProfile() {
     const raw = localStorage.getItem('pl_profile');
-    if (!raw) return null;
+    if (!raw) return;
     const data = JSON.parse(raw);
-    nameInput.value = data.name || '';
-    birthdateInput.value = data.birthdate || '';
+    if (data.name) nameInput.value = data.name;
+    if (data.birthdate) birthdateInput.value = data.birthdate;
     (data.allergens || []).forEach(a => selections.allergens.add(a));
+    (data.otherAllergenIngredients || []).forEach(a => selections.otherAllergenIngredients.add(a));
     (data.cannotEat || []).forEach(a => selections.cannotEat.add(a));
     (data.dislikes || []).forEach(a => selections.dislikes.add(a));
     (data.likes || []).forEach(a => selections.likes.add(a));
     (data.wantsToIntroduce || []).forEach(a => selections.wantsToIntroduce.add(a));
-    return data;
   }
 
-  function buildAllergenChips(dictionary) {
+  // --- Zbiór ID składników zablokowanych przez alergeny ---
+  function getBlockedIngredientIds() {
+    const blocked = new Set();
+    dictionary.ingredients.forEach(ing => {
+      if (ing.allergen && selections.allergens.has(ing.allergen)) blocked.add(ing.id);
+    });
+    selections.otherAllergenIngredients.forEach(id => blocked.add(id));
+    return blocked;
+  }
+
+  // --- Alergeny: chipy standardowe ---
+  function renderAllergenChips() {
     const container = document.getElementById('allergen-chips');
+    container.innerHTML = '';
     dictionary.allergens.forEach(a => {
       const chip = document.createElement('div');
       chip.className = 'chip tone-warn' + (selections.allergens.has(a) ? ' active' : '');
       chip.textContent = allergenLabels[a] || a;
       chip.addEventListener('click', () => {
-        if (selections.allergens.has(a)) { selections.allergens.delete(a); chip.classList.remove('active'); }
-        else { selections.allergens.add(a); chip.classList.add('active'); }
+        if (selections.allergens.has(a)) selections.allergens.delete(a);
+        else selections.allergens.add(a);
+        renderAllergenChips();
+        renderAllIngredientSelectors();
       });
       container.appendChild(chip);
     });
   }
 
-  function buildIngredientChips(containerId, selectionSet, tone, dictionary) {
+  // --- Alergeny: "Inne" wyszukiwanie ---
+  function renderOtherAllergenSelected() {
+    const container = document.getElementById('other-allergen-selected');
+    container.innerHTML = '';
+    Array.from(selections.otherAllergenIngredients).forEach(id => {
+      const ing = dictionary.ingredients.find(i => i.id === id);
+      if (!ing) return;
+      const chip = document.createElement('div');
+      chip.className = 'chip selected-chip';
+      chip.textContent = ing.name;
+      chip.addEventListener('click', () => {
+        selections.otherAllergenIngredients.delete(id);
+        renderOtherAllergenSelected();
+        renderAllIngredientSelectors();
+      });
+      container.appendChild(chip);
+    });
+  }
+
+  function renderOtherAllergenSuggestions(query) {
+    const container = document.getElementById('other-allergen-suggestions');
+    container.innerHTML = '';
+    if (!query) return;
+    const q = query.toLowerCase();
+    dictionary.ingredients
+      .filter(ing => ing.name.toLowerCase().includes(q) && !selections.otherAllergenIngredients.has(ing.id))
+      .slice(0, 8)
+      .forEach(ing => {
+        const chip = document.createElement('div');
+        chip.className = 'suggestion-chip';
+        chip.textContent = ing.name;
+        chip.addEventListener('click', () => {
+          selections.otherAllergenIngredients.add(ing.id);
+          document.getElementById('other-allergen-search').value = '';
+          renderOtherAllergenSelected();
+          renderOtherAllergenSuggestions('');
+          renderAllIngredientSelectors();
+        });
+        container.appendChild(chip);
+      });
+  }
+
+  document.getElementById('other-allergen-search').addEventListener('input', (e) => {
+    renderOtherAllergenSuggestions(e.target.value);
+  });
+
+  // --- Generyczny selektor produktów (Nie może jeść / Nie lubi / Lubi / Do wprowadzenia) ---
+  function renderIngredientSelector(containerId, selectionSet) {
     const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const blocked = getBlockedIngredientIds();
+
+    // Wybrane na górze
+    const selectedWrap = document.createElement('div');
+    selectedWrap.className = 'selected-row';
+    const selLabel = document.createElement('div');
+    selLabel.className = 'group-title';
+    selLabel.textContent = 'Wybrane';
+    selectedWrap.appendChild(selLabel);
+
+    if (selectionSet.size === 0) {
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.textContent = 'Nic jeszcze nie wybrano.';
+      selectedWrap.appendChild(hint);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'chip-grid';
+      Array.from(selectionSet).forEach(id => {
+        const ing = dictionary.ingredients.find(i => i.id === id);
+        if (!ing) return;
+        const chip = document.createElement('div');
+        chip.className = 'chip selected-chip';
+        chip.textContent = ing.name;
+        chip.addEventListener('click', () => {
+          selectionSet.delete(id);
+          renderIngredientSelector(containerId, selectionSet);
+        });
+        grid.appendChild(chip);
+      });
+      selectedWrap.appendChild(grid);
+    }
+    container.appendChild(selectedWrap);
+
+    // Dostępne, pogrupowane
     const byGroup = {};
     dictionary.ingredients.forEach(ing => {
+      if (selectionSet.has(ing.id) || blocked.has(ing.id)) return;
       if (!byGroup[ing.group]) byGroup[ing.group] = [];
       byGroup[ing.group].push(ing);
     });
@@ -228,32 +378,35 @@
 
       const grid = document.createElement('div');
       grid.className = 'chip-grid';
-
       byGroup[group].forEach(ing => {
         const chip = document.createElement('div');
-        chip.className = 'chip ' + tone + (selectionSet.has(ing.id) ? ' active' : '');
+        chip.className = 'chip ingredient-chip';
         chip.textContent = ing.name;
         chip.addEventListener('click', () => {
-          if (selectionSet.has(ing.id)) { selectionSet.delete(ing.id); chip.classList.remove('active'); }
-          else { selectionSet.add(ing.id); chip.classList.add('active'); }
+          selectionSet.add(ing.id);
+          renderIngredientSelector(containerId, selectionSet);
         });
         grid.appendChild(chip);
       });
-
       block.appendChild(grid);
       container.appendChild(block);
     });
   }
 
-  async function init() {
-    loadExistingProfile();
-    const dictionary = await fetch('slownik-skladnikow.json').then(r => r.json());
+  function renderAllIngredientSelectors() {
+    renderIngredientSelector('cannotEat-groups', selections.cannotEat);
+    renderIngredientSelector('dislikes-groups', selections.dislikes);
+    renderIngredientSelector('likes-groups', selections.likes);
+    renderIngredientSelector('wantsToIntroduce-groups', selections.wantsToIntroduce);
+  }
 
-    buildAllergenChips(dictionary);
-    buildIngredientChips('cannotEat-groups', selections.cannotEat, 'tone-warn', dictionary);
-    buildIngredientChips('dislikes-groups', selections.dislikes, 'tone-pumpkin', dictionary);
-    buildIngredientChips('likes-groups', selections.likes, 'tone-leaf', dictionary);
-    buildIngredientChips('wantsToIntroduce-groups', selections.wantsToIntroduce, 'tone-leaf', dictionary);
+  // --- Zapis ---
+  let toastTimer = null;
+  function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
   document.getElementById('save-btn').addEventListener('click', () => {
@@ -261,16 +414,23 @@
       name: nameInput.value.trim(),
       birthdate: birthdateInput.value,
       allergens: Array.from(selections.allergens),
+      otherAllergenIngredients: Array.from(selections.otherAllergenIngredients),
       cannotEat: Array.from(selections.cannotEat),
       dislikes: Array.from(selections.dislikes),
       likes: Array.from(selections.likes),
       wantsToIntroduce: Array.from(selections.wantsToIntroduce)
     };
     localStorage.setItem('pl_profile', JSON.stringify(profile));
-    const confirmation = document.getElementById('confirmation');
-    confirmation.style.display = 'block';
-    confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast();
   });
+
+  async function init() {
+    loadExistingProfile();
+    dictionary = await fetch('slownik-skladnikow.json').then(r => r.json());
+    renderAllergenChips();
+    renderOtherAllergenSelected();
+    renderAllIngredientSelectors();
+  }
 
   init();
 </script>
