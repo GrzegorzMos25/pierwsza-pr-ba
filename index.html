@@ -88,6 +88,43 @@
 
   .nav-row a:hover { border-color: var(--pumpkin); }
 
+  .age-widget {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 28px 24px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .age-widget .age-name {
+    font-size: 14px;
+    color: #6B786D;
+    margin-bottom: 10px;
+  }
+
+  .age-widget .age-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .age-widget .age-item .num {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--leaf);
+    display: block;
+    font-family: Georgia, serif;
+  }
+
+  .age-widget .age-item .label {
+    font-size: 12px;
+    color: #9AA59A;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
   .section-label {
     font-size: 13px;
     font-weight: 700;
@@ -188,25 +225,63 @@
   <div class="nav-row">
     <a href="profil.html">Profil dziecka</a>
     <a href="kalendarz.html">Kalendarz diety</a>
+    <a href="plan-posilkow.html">Plan posiłków</a>
   </div>
 </header>
 
 <main>
+  <div class="age-widget" id="age-widget"></div>
+
   <div class="section-label">Przepisy</div>
   <div class="recipe-grid">
 
     <a class="recipe-card" href="puree-z-dyni.html">
-      <span class="recipe-eyebrow">Warzywo</span>
+      <span class="recipe-eyebrow">Warzywo · 6+ mcy</span>
       <h2 class="display">Puree z dyni</h2>
       <p>Słodkie, gładkie puree — klasyczny pierwszy posiłek.</p>
       <span class="time">15 min</span>
     </a>
 
     <a class="recipe-card" href="puree-z-jablka.html">
-      <span class="recipe-eyebrow">Owoc</span>
+      <span class="recipe-eyebrow">Owoc · 6+ mcy</span>
       <h2 class="display">Puree z jabłka</h2>
       <p>Naturalnie słodkie i lekkostrawne.</p>
       <span class="time">12 min</span>
+    </a>
+
+    <a class="recipe-card" href="owsianka-gruszka.html">
+      <span class="recipe-eyebrow">Śniadanie · 8+ mcy</span>
+      <h2 class="display">Owsianka z gruszką</h2>
+      <p>Rozgrzewające śniadanie z błonnikiem.</p>
+      <span class="time">10 min</span>
+    </a>
+
+    <a class="recipe-card" href="kurczak-bataty-brokul.html">
+      <span class="recipe-eyebrow">Obiad · 9+ mcy</span>
+      <h2 class="display">Kurczak z batatami i brokułem</h2>
+      <p>Pełnowartościowy obiad z białkiem.</p>
+      <span class="time">25 min</span>
+    </a>
+
+    <a class="recipe-card" href="rybne-kotlety.html">
+      <span class="recipe-eyebrow">Kolacja · 9+ mcy</span>
+      <h2 class="display">Rybne kotlety z ziemniakiem</h2>
+      <p>Delikatne kotleciki do samodzielnego chwytania.</p>
+      <span class="time">20 min</span>
+    </a>
+
+    <a class="recipe-card" href="slupki-warzywne.html">
+      <span class="recipe-eyebrow">Przekąska · 8+ mcy</span>
+      <h2 class="display">Słupki warzywne na parze</h2>
+      <p>Prosty finger food do nauki gryzienia.</p>
+      <span class="time">12 min</span>
+    </a>
+
+    <a class="recipe-card" href="jogurt-owoce-platki.html">
+      <span class="recipe-eyebrow">Przekąska · 8+ mcy</span>
+      <h2 class="display">Jogurt z owocami i płatkami</h2>
+      <p>Szybka przekąska bogata w wapń.</p>
+      <span class="time">5 min</span>
     </a>
 
     <div class="recipe-card coming-soon">
@@ -219,6 +294,39 @@
 <footer>
   Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.
 </footer>
+
+<script>
+  // Jeśli nie ma jeszcze zapisanego profilu, ustaw domyślny (do testów)
+  if (!localStorage.getItem('pl_profile')) {
+    localStorage.setItem('pl_profile', JSON.stringify({
+      name: 'Dziecko',
+      birthdate: '2025-08-22'
+    }));
+  }
+
+  const profile = JSON.parse(localStorage.getItem('pl_profile'));
+  const birthdate = new Date(profile.birthdate);
+  const today = new Date();
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const days = Math.floor((today - birthdate) / msPerDay);
+  const weeks = Math.floor(days / 7);
+
+  let months = (today.getFullYear() - birthdate.getFullYear()) * 12;
+  months += today.getMonth() - birthdate.getMonth();
+  if (today.getDate() < birthdate.getDate()) months -= 1;
+  months = Math.max(0, months);
+
+  const widget = document.getElementById('age-widget');
+  widget.innerHTML = `
+    <div class="age-name">${profile.name}</div>
+    <div class="age-numbers">
+      <div class="age-item"><span class="num">${months}</span><span class="label">miesięcy</span></div>
+      <div class="age-item"><span class="num">${weeks}</span><span class="label">tygodni</span></div>
+      <div class="age-item"><span class="num">${days}</span><span class="label">dni</span></div>
+    </div>
+  `;
+</script>
 
 </body>
 </html>

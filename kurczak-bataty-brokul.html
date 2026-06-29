@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kurczak z batatami i brokułem — Pierwsze Łyżeczki</title>
+<style>
+  :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.6; }
+  .display { font-family:Georgia,'Iowan Old Style',serif; }
+  .back-link { display:block; max-width:720px; margin:24px auto 0; padding:0 24px; font-size:14px; color:var(--leaf); text-decoration:none; }
+  .back-link:hover { text-decoration:underline; }
+  header { padding:24px 24px 40px; max-width:720px; margin:0 auto; text-align:center; }
+  .eyebrow { display:inline-block; background:var(--pumpkin-soft); color:var(--pumpkin); font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px; margin-bottom:20px; }
+  h1 { font-size:42px; font-weight:700; color:var(--leaf); margin-bottom:12px; letter-spacing:-0.01em; }
+  .subtitle { font-size:17px; color:#5C6B5F; max-width:480px; margin:0 auto; }
+  .meta-row { display:flex; justify-content:center; gap:28px; margin-top:28px; flex-wrap:wrap; }
+  .meta-item { text-align:center; }
+  .meta-item .num { font-size:22px; font-weight:700; color:var(--pumpkin); display:block; }
+  .meta-item .label { font-size:12px; color:#7A8779; text-transform:uppercase; letter-spacing:0.05em; }
+  main { max-width:720px; margin:0 auto; padding:0 24px 80px; }
+  .card { background:white; border:1px solid var(--line); border-radius:18px; padding:36px; margin-bottom:28px; }
+  .card h2 { font-size:22px; color:var(--leaf); margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+  .card h2::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--pumpkin); display:inline-block; }
+  ul.ingredients { list-style:none; }
+  ul.ingredients li { display:flex; align-items:baseline; gap:12px; padding:10px 0; border-bottom:1px dashed var(--line); font-size:15px; }
+  ul.ingredients li:last-child { border-bottom:none; }
+  ul.ingredients li .amount { font-weight:700; color:var(--leaf); min-width:90px; }
+  ol.steps { list-style:none; counter-reset:step; }
+  ol.steps li { counter-increment:step; position:relative; padding:0 0 0 44px; margin-bottom:22px; font-size:15px; }
+  ol.steps li:last-child { margin-bottom:0; }
+  ol.steps li::before { content:counter(step); position:absolute; left:0; top:-2px; width:28px; height:28px; border-radius:8px; background:var(--leaf-soft); color:var(--leaf); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .safety { background:var(--leaf-soft); border:none; }
+  .safety h2::before { background:var(--leaf); }
+  .safety p { font-size:15px; margin-bottom:10px; }
+  .safety p:last-child { margin-bottom:0; }
+  .safety strong { color:var(--leaf); }
+  footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
+  @media (max-width:480px) { h1{font-size:32px;} .card{padding:24px;} header{padding:16px 20px 32px;} }
+</style>
+</head>
+<body>
+<a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
+<header>
+  <span class="eyebrow">Obiad · 9+ miesięcy</span>
+  <h1 class="display">Kurczak z batatami i brokułem</h1>
+  <p class="subtitle">Pełnowartościowy obiad z białkiem, warzywami i odrobiną zdrowego tłuszczu.</p>
+  <div class="meta-row">
+    <div class="meta-item"><span class="num">25 min</span><span class="label">Czas</span></div>
+    <div class="meta-item"><span class="num">4</span><span class="label">Składniki</span></div>
+    <div class="meta-item"><span class="num">1 porcja</span><span class="label">Wydajność</span></div>
+  </div>
+</header>
+<main>
+  <div class="card">
+    <h2>Składniki</h2>
+    <ul class="ingredients">
+      <li><span class="amount">60 g</span> filetu z kurczaka, pokrojonego w małą kostkę</li>
+      <li><span class="amount">80 g</span> batata, obranego i pokrojonego w kostkę</li>
+      <li><span class="amount">50 g</span> brokułu, podzielonego na małe różyczki</li>
+      <li><span class="amount">1 łyżeczka</span> oliwy z oliwek</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Przygotowanie</h2>
+    <ol class="steps">
+      <li>Kurczaka gotuj na parze lub w niewielkiej ilości wody ok. 15–18 minut, do całkowitego ugotowania w środku.</li>
+      <li>Równolegle ugotuj batata i brokuł na parze ok. 12–15 minut, do miękkości.</li>
+      <li>Połącz kurczaka, batata i brokuł w jednej misce.</li>
+      <li>Rozgnieć widelcem na drobne kawałki — nie na gładkie puree, drobne grudki uczą żucia.</li>
+      <li>Dodaj oliwę z oliwek, wymieszaj i ostudź do temperatury letniej przed podaniem.</li>
+    </ol>
+  </div>
+  <div class="card safety">
+    <h2>Bezpieczeństwo i wskazówki</h2>
+    <p><strong>Kurczak:</strong> upewnij się, że mięso jest ugotowane w środku na wskroś — bez różowego koloru.</p>
+    <p><strong>Konsystencja:</strong> na tym etapie dziecko może jeść drobne kawałki — unikaj jednak dużych, twardych kęsów brokułu.</p>
+    <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
+  </div>
+</main>
+<footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+</body>
+</html>
