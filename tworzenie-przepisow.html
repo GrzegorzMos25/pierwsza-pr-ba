@@ -17,6 +17,13 @@
   .subtitle { font-size:16px; color:#5C6B5F; max-width:560px; margin:0 auto; }
   main { max-width:900px; margin:0 auto; padding:24px 24px 80px; }
 
+  .profile-note {
+    background:white; border:1px solid var(--line); border-radius:14px;
+    padding:16px 22px; margin-bottom:24px; font-size:13px; color:#6B786D;
+  }
+  .profile-note strong { color:var(--leaf); }
+  .profile-note a { color:var(--pumpkin); font-weight:700; text-decoration:none; }
+
   .step-label {
     font-size:13px; font-weight:700; color:var(--leaf); text-transform:uppercase;
     letter-spacing:0.05em; margin-bottom:14px; display:flex; align-items:center; gap:8px;
@@ -32,19 +39,23 @@
   .chip {
     border:1px solid var(--line); border-radius:100px; padding:9px 16px;
     font-size:14px; cursor:pointer; background:var(--paper); user-select:none;
-    transition: all 0.15s ease;
+    transition: all 0.15s ease; position:relative;
   }
-  .chip.allergen-chip.active {
-    background:var(--warn); border-color:var(--warn); color:white;
-  }
-  .chip.ingredient-chip.active {
-    background:var(--leaf); border-color:var(--leaf); color:white;
-  }
+  .chip.allergen-chip.active { background:var(--warn); border-color:var(--warn); color:white; }
+  .chip.ingredient-chip.active { background:var(--leaf); border-color:var(--leaf); color:white; }
   .chip:hover { border-color:var(--pumpkin); }
+  .chip.locked { opacity:0.85; cursor:not-allowed; }
+  .chip.locked::after { content:" 🔒"; font-size:11px; }
+  .chip.liked::before { content:"♥ "; color:#C2542E; }
+  .chip.ingredient-chip.active.liked::before { color:white; }
+  .chip.to-introduce { border-style:dashed; }
 
   .group-block { margin-bottom:18px; }
   .group-block:last-child { margin-bottom:0; }
   .group-title { font-size:12px; color:#9AA59A; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; }
+
+  .legend { display:flex; gap:18px; font-size:12px; color:#9AA59A; margin-top:14px; flex-wrap:wrap; }
+  .legend span { display:flex; align-items:center; gap:5px; }
 
   .results-summary {
     display:flex; justify-content:space-between; align-items:center;
@@ -63,30 +74,22 @@
 
   .recipe-result h3 { font-size:17px; color:var(--ink); margin-bottom:4px; }
   .recipe-result .meta { font-size:13px; color:#9AA59A; }
-  .match-badge {
-    font-size:12px; font-weight:700; padding:5px 12px; border-radius:100px;
-  }
+  .match-badge { font-size:12px; font-weight:700; padding:5px 12px; border-radius:100px; }
   .match-badge.full { background:var(--leaf-soft); color:var(--leaf); }
   .match-badge.partial { background:var(--pumpkin-soft); color:var(--pumpkin); }
 
   .missing-list { font-size:12px; color:var(--warn); margin-top:4px; }
+  .dislike-list { font-size:12px; color:var(--pumpkin); margin-top:4px; }
+  .introduce-list { font-size:12px; color:var(--leaf); margin-top:4px; font-weight:700; }
 
-  .empty-state {
-    text-align:center; padding:48px 24px; color:#9AA59A; font-size:14px;
-  }
-
-  .recipe-result a.view-link {
-    font-size:13px; font-weight:700; color:var(--pumpkin); text-decoration:none;
-  }
-
+  .empty-state { text-align:center; padding:48px 24px; color:#9AA59A; font-size:14px; }
+  .recipe-result a.view-link { font-size:13px; font-weight:700; color:var(--pumpkin); text-decoration:none; }
   .loading { text-align:center; padding:40px; color:#9AA59A; font-size:14px; }
+  .excluded-note { font-size:13px; color:#9AA59A; margin-top:10px; text-align:center; }
 
   footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
 
-  @media (max-width:600px) {
-    h1 { font-size:30px; }
-    .card { padding:20px; }
-  }
+  @media (max-width:600px) { h1 { font-size:30px; } .card { padding:20px; } }
 </style>
 </head>
 <body>
@@ -96,19 +99,27 @@
 <header>
   <span class="eyebrow">Dopasowywanie przepisów</span>
   <h1 class="display">Co mam, co ugotuję?</h1>
-  <p class="subtitle">Wybierz alergeny do wykluczenia i produkty, które masz pod ręką — pokażemy przepisy, które da się z nich zrobić.</p>
+  <p class="subtitle">Wybierz produkty, które masz pod ręką — pokażemy przepisy, które da się z nich zrobić.</p>
 </header>
 
 <main>
 
+  <div class="profile-note" id="profile-note"></div>
+
   <div class="card">
     <div class="step-label"><span class="num">1</span> Alergeny do wykluczenia</div>
     <div class="chip-grid" id="allergen-chips"></div>
+    <div class="legend"><span>🔒 = z profilu dziecka, zawsze wykluczone</span></div>
   </div>
 
   <div class="card">
     <div class="step-label"><span class="num">2</span> Produkty, które masz / dziecko już jadło</div>
     <div id="ingredient-groups"></div>
+    <div class="legend">
+      <span>♥ = dziecko lubi</span>
+      <span>linia przerywana = chcesz wkrótce wprowadzić</span>
+      <span>🔒 = dziecko nie może jeść, niedostępne</span>
+    </div>
   </div>
 
   <div class="results-summary">
@@ -135,35 +146,48 @@
 
   let dictionary = null;
   let recipeFiles = [];
-  let recipes = []; // { data, file }
+  let recipes = [];
+  let profile = null;
+
   const selectedAllergens = new Set();
   const selectedIngredients = new Set();
 
-  async function init() {
-    const [dictRes, indexRes] = await Promise.all([
-      fetch('slownik-skladnikow.json').then(r => r.json()),
-      fetch('recipes-index.json').then(r => r.json())
-    ]);
-    dictionary = dictRes;
-    recipeFiles = indexRes;
+  function loadProfile() {
+    const raw = localStorage.getItem('pl_profile');
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    p.allergens = p.allergens || [];
+    p.cannotEat = p.cannotEat || [];
+    p.dislikes = p.dislikes || [];
+    p.likes = p.likes || [];
+    p.wantsToIntroduce = p.wantsToIntroduce || [];
+    return p;
+  }
 
-    renderAllergenChips();
-    renderIngredientGroups();
-    await loadRecipes();
-    renderResults();
+  function renderProfileNote() {
+    const el = document.getElementById('profile-note');
+    if (!profile) {
+      el.innerHTML = `Nie masz jeszcze uzupełnionego profilu dziecka. <a href="profil.html">Uzupełnij profil</a>, żeby alergeny i preferencje były automatycznie brane pod uwagę.`;
+      return;
+    }
+    el.innerHTML = `Profil: <strong>${profile.name || 'Dziecko'}</strong> — alergeny i produkty z profilu są już brane pod uwagę. <a href="profil.html">Edytuj profil</a>`;
   }
 
   function renderAllergenChips() {
     const container = document.getElementById('allergen-chips');
     dictionary.allergens.forEach(a => {
+      const isLocked = profile && profile.allergens.includes(a);
+      if (isLocked) selectedAllergens.add(a);
       const chip = document.createElement('div');
-      chip.className = 'chip allergen-chip';
+      chip.className = 'chip allergen-chip' + (isLocked ? ' active locked' : '');
       chip.textContent = allergenLabels[a] || a;
-      chip.addEventListener('click', () => {
-        if (selectedAllergens.has(a)) { selectedAllergens.delete(a); chip.classList.remove('active'); }
-        else { selectedAllergens.add(a); chip.classList.add('active'); }
-        renderResults();
-      });
+      if (!isLocked) {
+        chip.addEventListener('click', () => {
+          if (selectedAllergens.has(a)) { selectedAllergens.delete(a); chip.classList.remove('active'); }
+          else { selectedAllergens.add(a); chip.classList.add('active'); }
+          renderResults();
+        });
+      }
       container.appendChild(chip);
     });
   }
@@ -188,14 +212,27 @@
       grid.className = 'chip-grid';
 
       byGroup[group].forEach(ing => {
+        const cannotEat = profile && profile.cannotEat.includes(ing.id);
+        const liked = profile && profile.likes.includes(ing.id);
+        const toIntroduce = profile && profile.wantsToIntroduce.includes(ing.id);
+
         const chip = document.createElement('div');
-        chip.className = 'chip ingredient-chip';
+        let cls = 'chip ingredient-chip';
+        if (liked) cls += ' liked';
+        if (toIntroduce) cls += ' to-introduce';
+        if (cannotEat) cls += ' locked';
+        chip.className = cls;
         chip.textContent = ing.name;
-        chip.addEventListener('click', () => {
-          if (selectedIngredients.has(ing.id)) { selectedIngredients.delete(ing.id); chip.classList.remove('active'); }
-          else { selectedIngredients.add(ing.id); chip.classList.add('active'); }
-          renderResults();
-        });
+
+        if (cannotEat) {
+          chip.title = 'Dziecko nie może jeść tego produktu (ustawione w profilu)';
+        } else {
+          chip.addEventListener('click', () => {
+            if (selectedIngredients.has(ing.id)) { selectedIngredients.delete(ing.id); chip.classList.remove('active'); }
+            else { selectedIngredients.add(ing.id); chip.classList.add('active'); }
+            renderResults();
+          });
+        }
         grid.appendChild(chip);
       });
 
@@ -205,9 +242,6 @@
   }
 
   async function loadRecipes() {
-    const resultsEl = document.getElementById('results');
-    resultsEl.innerHTML = '<div class="loading">Wczytywanie przepisów...</div>';
-
     const loaded = await Promise.all(recipeFiles.map(async file => {
       try {
         const res = await fetch(file);
@@ -220,7 +254,6 @@
         return null;
       }
     }));
-
     recipes = loaded.filter(r => r !== null);
   }
 
@@ -230,22 +263,29 @@
     resultsEl.innerHTML = '';
 
     const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+    const cannotEat = profile ? profile.cannotEat : [];
+    const dislikes = profile ? profile.dislikes : [];
+    const wantsToIntroduce = profile ? profile.wantsToIntroduce : [];
 
-    // Wyklucz przepisy z wybranymi alergenami
+    let excludedByCannotEat = 0;
+
     const safeRecipes = recipes.filter(r => {
       const allergens = r.data.allergens || [];
-      return !allergens.some(a => selectedAllergens.has(a));
+      if (allergens.some(a => selectedAllergens.has(a))) return false;
+      const hasCannotEat = r.data.ingredients.some(i => cannotEat.includes(i.id));
+      if (hasCannotEat) { excludedByCannotEat++; return false; }
+      return true;
     });
 
     const scored = safeRecipes.map(r => {
       const required = r.data.ingredients.filter(i => !i.optional);
-      const have = required.filter(i => selectedIngredients.has(i.id));
       const missing = required.filter(i => !selectedIngredients.has(i.id));
       const isFullMatch = missing.length === 0 && selectedIngredients.size > 0;
-      return { ...r, have, missing, isFullMatch, requiredCount: required.length };
+      const dislikedHere = r.data.ingredients.filter(i => dislikes.includes(i.id));
+      const introduceHere = r.data.ingredients.filter(i => wantsToIntroduce.includes(i.id));
+      return { ...r, missing, isFullMatch, requiredCount: required.length, dislikedHere, introduceHere };
     });
 
-    // Sortuj: pełne dopasowania najpierw, potem po liczbie brakujących składników
     scored.sort((a, b) => {
       if (a.isFullMatch && !b.isFullMatch) return -1;
       if (!a.isFullMatch && b.isFullMatch) return 1;
@@ -262,7 +302,7 @@
     countEl.textContent = `${fullCount} z ${recipes.length} przepisów da się zrobić od razu`;
 
     if (scored.length === 0) {
-      resultsEl.innerHTML = '<div class="empty-state">Żaden przepis nie spełnia wybranych warunków (alergeny).</div>';
+      resultsEl.innerHTML = '<div class="empty-state">Żaden przepis nie spełnia wybranych warunków.</div>';
       return;
     }
 
@@ -271,14 +311,17 @@
       div.className = 'recipe-result ' + (r.isFullMatch ? 'full-match' : 'partial-match');
 
       const missingText = r.missing.length
-        ? `<div class="missing-list">Brakuje: ${r.missing.map(i => i.name).join(', ')}</div>`
-        : '';
+        ? `<div class="missing-list">Brakuje: ${r.missing.map(i => i.name).join(', ')}</div>` : '';
+      const dislikeText = r.dislikedHere.length
+        ? `<div class="dislike-list">Zawiera nielubiane: ${r.dislikedHere.map(i => i.name).join(', ')}</div>` : '';
+      const introduceText = r.introduceHere.length
+        ? `<div class="introduce-list">Okazja, by wprowadzić: ${r.introduceHere.map(i => i.name).join(', ')}</div>` : '';
 
       div.innerHTML = `
         <div>
           <h3 class="display">${r.data.title}</h3>
           <div class="meta">${categoryLabels[r.data.category] || r.data.category} · ${r.data.min_age_months}+ mcy · ${r.data.time_minutes} min</div>
-          ${missingText}
+          ${missingText}${dislikeText}${introduceText}
         </div>
         <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
           <span class="match-badge ${r.isFullMatch ? 'full' : 'partial'}">${r.isFullMatch ? 'Masz wszystko' : (r.requiredCount - r.missing.length) + '/' + r.requiredCount + ' składników'}</span>
@@ -287,6 +330,31 @@
       `;
       resultsEl.appendChild(div);
     });
+
+    if (excludedByCannotEat > 0) {
+      const note = document.createElement('div');
+      note.className = 'excluded-note';
+      note.textContent = `${excludedByCannotEat} przepis(y) wykluczono ze względu na produkty, których dziecko nie może jeść.`;
+      resultsEl.appendChild(note);
+    }
+  }
+
+  async function init() {
+    profile = loadProfile();
+    renderProfileNote();
+
+    const [dictRes, indexRes] = await Promise.all([
+      fetch('slownik-skladnikow.json').then(r => r.json()),
+      fetch('recipes-index.json').then(r => r.json())
+    ]);
+    dictionary = dictRes;
+    recipeFiles = indexRes;
+
+    renderAllergenChips();
+    renderIngredientGroups();
+    document.getElementById('results').innerHTML = '<div class="loading">Wczytywanie przepisów...</div>';
+    await loadRecipes();
+    renderResults();
   }
 
   init();
