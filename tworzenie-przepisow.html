@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tworzenie przepisów</title>
+
+<style>
+body{
+    font-family: Arial,sans-serif;
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.section{
+    margin-bottom:30px;
+}
+
+.ingredients{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:8px;
+}
+
+.recipe{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:10px;
+}
+button{
+    padding:12px 20px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Tworzenie przepisów</h1>
+
+<div class="section">
+<h2>Alergeny</h2>
+
+<label><input type="checkbox" value="gluten"> Gluten</label><br>
+<label><input type="checkbox" value="jajo"> Jajo</label><br>
+<label><input type="checkbox" value="ryba"> Ryba</label><br>
+<label><input type="checkbox" value="mleko_krowie"> Mleko</label><br>
+</div>
+
+<div class="section">
+<h2>Składniki</h2>
+
+<div class="ingredients">
+
+<label><input type="checkbox" value="dynia"> Dynia</label>
+<label><input type="checkbox" value="jablko"> Jabłko</label>
+<label><input type="checkbox" value="gruszka"> Gruszka</label>
+<label><input type="checkbox" value="brokul"> Brokuł</label>
+<label><input type="checkbox" value="batat"> Batat</label>
+<label><input type="checkbox" value="filet_z_kurczaka"> Kurczak</label>
+
+</div>
+</div>
+
+<button onclick="szukajPrzepisow()">
+Znajdź przepisy
+</button>
+
+<hr>
+
+<div id="wyniki"></div>
+
+<script>
+
+const przepisy = [
+
+{
+name:"Puree z dyni",
+url:"puree-z-dyni.html",
+ingredients:["dynia"]
+},
+
+{
+name:"Puree z jabłka",
+url:"puree-z-jablka.html",
+ingredients:["jablko"]
+},
+
+{
+name:"Owsianka z gruszką",
+url:"owsianka-gruszka.html",
+ingredients:["gruszka"]
+},
+
+{
+name:"Kurczak z batatami i brokułem",
+url:"kurczak-bataty-brokul.html",
+ingredients:["filet_z_kurczaka","batat","brokul"]
+}
+
+];
+
+function szukajPrzepisow(){
+
+const wybrane = [];
+
+document
+.querySelectorAll('.ingredients input:checked')
+.forEach(el => {
+    wybrane.push(el.value);
+});
+
+const wyniki = document.getElementById('wyniki');
+
+wyniki.innerHTML='';
+
+const znalezione = przepisy.filter(przepis => {
+
+return wybrane.every(skladnik =>
+przepis.ingredients.includes(skladnik)
+);
+
+});
+
+if(znalezione.length===0){
+
+wyniki.innerHTML=
+'<p>Nie znaleziono przepisów.</p>';
+
+return;
+}
+
+znalezione.forEach(przepis => {
+
+wyniki.innerHTML += `
+<div class="recipe">
+<h3>${przepis.name}</h3>
+<a href="${przepis.url}">
+Otwórz przepis
+</a>
+</div>
+`;
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
