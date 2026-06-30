@@ -94,6 +94,40 @@
   }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+  /* --- Tydzień i odżywianie --- */
+  .week-picker { display:flex; align-items:center; gap:14px; margin-bottom:24px; flex-wrap:wrap; }
+  .week-picker label { margin:0; }
+  .week-range { font-size:14px; color:#6B786D; }
+
+  .day-row {
+    display:grid; grid-template-columns:110px repeat(4, 1fr); gap:10px;
+    align-items:center; padding:10px 0; border-bottom:1px dashed var(--line);
+  }
+  .day-row:last-child { border-bottom:none; }
+  .day-row .day-label { font-size:13px; font-weight:700; color:var(--leaf); }
+  .day-row select {
+    width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px;
+    font-size:13px; font-family:inherit; background:var(--paper); color:var(--ink);
+  }
+  .meal-header { display:grid; grid-template-columns:110px repeat(4, 1fr); gap:10px; margin-bottom:6px; }
+  .meal-header span { font-size:11px; color:#9AA59A; text-transform:uppercase; letter-spacing:0.04em; }
+
+  .nutrient-row { margin-bottom:18px; }
+  .nutrient-row:last-child { margin-bottom:0; }
+  .nutrient-top { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; }
+  .nutrient-top .name { font-weight:700; color:var(--ink); }
+  .nutrient-top .values { color:#6B786D; }
+  .nutrient-bar-bg { height:10px; background:var(--leaf-soft); border-radius:100px; overflow:hidden; }
+  .nutrient-bar-fill { height:100%; background:var(--leaf); border-radius:100px; }
+  .nutrient-row.low .nutrient-bar-fill { background:var(--warn); }
+  .nutrient-row.low .nutrient-top .name { color:var(--warn); }
+  .nutrient-missing { font-size:12px; color:var(--warn); margin-top:4px; }
+
+  .approx-note {
+    font-size:12px; color:#9AA59A; background:var(--paper); border:1px dashed var(--line);
+    border-radius:10px; padding:12px 16px; margin-top:20px;
+  }
+
   footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
 
   @media (max-width:600px) {
@@ -122,6 +156,7 @@
     <button class="tab-btn" data-tab="nie-lubi">Nie lubi</button>
     <button class="tab-btn" data-tab="lubi">Lubi</button>
     <button class="tab-btn" data-tab="wprowadzic">Do wprowadzenia</button>
+    <button class="tab-btn" data-tab="tydzien">Tydzień i odżywianie</button>
   </div>
 
   <div class="panel active" id="panel-podstawowe">
@@ -189,6 +224,29 @@
 
   <div class="save-bar">
     <button class="save-btn" id="save-btn">Zapisz profil</button>
+  </div>
+
+  <div class="panel" id="panel-tydzien">
+    <div class="card">
+      <div class="step-label" style="font-size:13px;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;">Wybierz tydzień</div>
+      <div class="week-picker">
+        <label for="week-start" style="margin:0;">Poniedziałek tygodnia:</label>
+        <input type="date" id="week-start">
+        <span class="week-range" id="week-range"></span>
+      </div>
+
+      <div class="meal-header">
+        <span></span><span>Śniadanie</span><span>Obiad</span><span>Podwieczorek</span><span>Kolacja</span>
+      </div>
+      <div id="week-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-label" style="font-size:13px;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Wartości odżywcze w tym tygodniu</div>
+      <p class="panel-intro">Suma składników odżywczych z przypisanych posiłków w porównaniu do orientacyjnej normy tygodniowej (6-12 miesiąc życia).</p>
+      <div id="nutrient-summary"></div>
+      <div class="approx-note">Wyliczenia są orientacyjne — przeliczenia jednostek (np. "1 łyżka", "1 sztuka") na gramy są przybliżone, a wartości odżywcze pochodzą z ogólnych tabel żywieniowych. Traktuj to jako wskazówkę, nie dokładny pomiar — w razie wątpliwości skonsultuj się z dietetykiem dziecięcym.</div>
+    </div>
   </div>
 
 </main>
@@ -430,9 +488,206 @@
     renderAllergenChips();
     renderOtherAllergenSelected();
     renderAllIngredientSelectors();
+    await initWeekTab();
   }
 
   init();
+
+  // ===================== TYDZIEŃ I ODŻYWIANIE =====================
+
+  const unitToGrams = { g: 1, ml: 1, szt: 80, lyzka: 15, lyzeczka: 5, szczypta: 0.3 };
+  const nutrientLabels = {
+    iron_mg: "Żelazo", zinc_mg: "Cynk", vitamin_d_ug: "Witamina D", omega3_mg: "Omega-3",
+    calcium_mg: "Wapń", vitamin_b12_ug: "Witamina B12", iodine_ug: "Jod"
+  };
+  const nutrientUnits = {
+    iron_mg: "mg", zinc_mg: "mg", vitamin_d_ug: "µg", omega3_mg: "mg",
+    calcium_mg: "mg", vitamin_b12_ug: "µg", iodine_ug: "µg"
+  };
+  const dayNames = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
+  const mealSlots = ["sniadanie", "obiad", "podwieczorek", "kolacja"];
+  const mealSlotLabels = { sniadanie: "Śniadanie", obiad: "Obiad", podwieczorek: "Podwieczorek", kolacja: "Kolacja" };
+
+  let nutrientDictionary = null;
+  let recipesCache = [];
+  let currentWeekKey = null;
+
+  function getMonday(dateStr) {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+
+  function formatISO(date) {
+    return date.toISOString().split('T')[0];
+  }
+
+  function formatDisplay(date) {
+    return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' });
+  }
+
+  async function loadAllRecipes() {
+    const files = await fetch('recipes-index.json').then(r => r.json());
+    const loaded = await Promise.all(files.map(async file => {
+      try {
+        const res = await fetch(file);
+        const html = await res.text();
+        const match = html.match(/<script type="application\/json" id="recipe-data">([\s\S]*?)<\/script>/);
+        if (!match) return null;
+        return { data: JSON.parse(match[1]), file };
+      } catch (e) { return null; }
+    }));
+    return loaded.filter(r => r !== null);
+  }
+
+  function getWeekPlans() {
+    const raw = localStorage.getItem('pl_week_plans');
+    return raw ? JSON.parse(raw) : {};
+  }
+
+  function saveWeekPlans(plans) {
+    localStorage.setItem('pl_week_plans', JSON.stringify(plans));
+  }
+
+  function renderWeekGrid() {
+    const grid = document.getElementById('week-grid');
+    grid.innerHTML = '';
+    const plans = getWeekPlans();
+    const weekPlan = plans[currentWeekKey] || {};
+
+    dayNames.forEach((dayName, i) => {
+      const row = document.createElement('div');
+      row.className = 'day-row';
+
+      const label = document.createElement('div');
+      label.className = 'day-label';
+      label.textContent = dayName;
+      row.appendChild(label);
+
+      mealSlots.forEach(slot => {
+        const select = document.createElement('select');
+        const emptyOpt = document.createElement('option');
+        emptyOpt.value = '';
+        emptyOpt.textContent = '—';
+        select.appendChild(emptyOpt);
+
+        recipesCache.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r.file;
+          opt.textContent = r.data.title;
+          select.appendChild(opt);
+        });
+
+        const current = (weekPlan[dayName] || {})[slot] || '';
+        select.value = current;
+
+        select.addEventListener('change', () => {
+          const plansNow = getWeekPlans();
+          if (!plansNow[currentWeekKey]) plansNow[currentWeekKey] = {};
+          if (!plansNow[currentWeekKey][dayName]) plansNow[currentWeekKey][dayName] = {};
+          plansNow[currentWeekKey][dayName][slot] = select.value;
+          saveWeekPlans(plansNow);
+          renderNutrientSummary();
+        });
+
+        row.appendChild(select);
+      });
+
+      grid.appendChild(row);
+    });
+  }
+
+  function calculateWeekNutrients() {
+    const plans = getWeekPlans();
+    const weekPlan = plans[currentWeekKey] || {};
+    const totals = {};
+    Object.keys(nutrientLabels).forEach(k => totals[k] = 0);
+
+    Object.values(weekPlan).forEach(dayMeals => {
+      Object.values(dayMeals || {}).forEach(file => {
+        if (!file) return;
+        const recipe = recipesCache.find(r => r.file === file);
+        if (!recipe) return;
+        recipe.data.ingredients.forEach(ing => {
+          const dictEntry = nutrientDictionary.ingredients.find(d => d.id === ing.id);
+          if (!dictEntry) return;
+          const gramsPerUnit = unitToGrams[ing.unit] !== undefined ? unitToGrams[ing.unit] : 1;
+          const totalGrams = ing.amount * gramsPerUnit;
+          const factor = totalGrams / 100;
+          Object.keys(nutrientLabels).forEach(k => {
+            const val = dictEntry.nutrients[k];
+            if (val) totals[k] += val * factor;
+          });
+        });
+      });
+    });
+
+    return totals;
+  }
+
+  function renderNutrientSummary() {
+    const container = document.getElementById('nutrient-summary');
+    container.innerHTML = '';
+    const totals = calculateWeekNutrients();
+    const targets = nutrientDictionary.daily_targets_6_12_months;
+
+    Object.keys(nutrientLabels).forEach(key => {
+      const weeklyTarget = targets[key] * 7;
+      const have = totals[key];
+      const pct = weeklyTarget > 0 ? Math.min(100, Math.round((have / weeklyTarget) * 100)) : 0;
+      const isLow = pct < 70;
+      const missing = Math.max(0, weeklyTarget - have);
+
+      const row = document.createElement('div');
+      row.className = 'nutrient-row' + (isLow ? ' low' : '');
+      row.innerHTML = `
+        <div class="nutrient-top">
+          <span class="name">${nutrientLabels[key]}</span>
+          <span class="values">${have.toFixed(1)} / ${weeklyTarget.toFixed(1)} ${nutrientUnits[key]} (${pct}%)</span>
+        </div>
+        <div class="nutrient-bar-bg"><div class="nutrient-bar-fill" style="width:${pct}%"></div></div>
+        ${isLow ? `<div class="nutrient-missing">Brakuje ok. ${missing.toFixed(1)} ${nutrientUnits[key]} w tym tygodniu</div>` : ''}
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  async function initWeekTab() {
+    const weekStartInput = document.getElementById('week-start');
+    const today = new Date();
+    const monday = getMonday(formatISO(today));
+    weekStartInput.value = formatISO(monday);
+
+    function updateWeekRangeLabel() {
+      const start = getMonday(weekStartInput.value);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      document.getElementById('week-range').textContent = `${formatDisplay(start)} – ${formatDisplay(end)}`;
+      currentWeekKey = formatISO(start);
+    }
+
+    weekStartInput.addEventListener('change', () => {
+      const snapped = getMonday(weekStartInput.value);
+      weekStartInput.value = formatISO(snapped);
+      updateWeekRangeLabel();
+      renderWeekGrid();
+      renderNutrientSummary();
+    });
+
+    updateWeekRangeLabel();
+
+    const [nutrDict, recs] = await Promise.all([
+      fetch('slownik-skladnikow-odzywcze.json').then(r => r.json()),
+      loadAllRecipes()
+    ]);
+    nutrientDictionary = nutrDict;
+    recipesCache = recs;
+
+    renderWeekGrid();
+    renderNutrientSummary();
+  }
 </script>
 
 </body>
