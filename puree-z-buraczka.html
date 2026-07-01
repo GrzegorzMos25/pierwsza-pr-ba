@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Przepis — Pierwsze Łyżeczki</title>
+<style>
+  :root { --paper:#FAF6EE; --ink:#2E4234; --leaf:#3D5A45; --leaf-soft:#DCE8D8; --pumpkin:#E8833A; --pumpkin-soft:#FBE3CE; --line:#D8CFBC; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.6; }
+  .display { font-family:Georgia,'Iowan Old Style',serif; }
+  .back-link { display:block; max-width:720px; margin:24px auto 0; padding:0 24px; font-size:14px; color:var(--leaf); text-decoration:none; }
+  .back-link:hover { text-decoration:underline; }
+  header { padding:24px 24px 40px; max-width:720px; margin:0 auto; text-align:center; }
+  .eyebrow { display:inline-block; background:var(--pumpkin-soft); color:var(--pumpkin); font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px; margin-bottom:20px; }
+  h1 { font-size:42px; font-weight:700; color:var(--leaf); margin-bottom:12px; letter-spacing:-0.01em; }
+  .subtitle { font-size:17px; color:#5C6B5F; max-width:480px; margin:0 auto; }
+  .meta-row { display:flex; justify-content:center; gap:28px; margin-top:28px; flex-wrap:wrap; }
+  .meta-item { text-align:center; }
+  .meta-item .num { font-size:22px; font-weight:700; color:var(--pumpkin); display:block; }
+  .meta-item .label { font-size:12px; color:#7A8779; text-transform:uppercase; letter-spacing:0.05em; }
+  main { max-width:720px; margin:0 auto; padding:0 24px 80px; }
+  .card { background:white; border:1px solid var(--line); border-radius:18px; padding:36px; margin-bottom:28px; }
+  .card h2 { font-size:22px; color:var(--leaf); margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+  .card h2::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--pumpkin); display:inline-block; }
+  ul.ingredients { list-style:none; }
+  ul.ingredients li { display:flex; align-items:baseline; gap:12px; padding:10px 0; border-bottom:1px dashed var(--line); font-size:15px; }
+  ul.ingredients li:last-child { border-bottom:none; }
+  ul.ingredients li .amount { font-weight:700; color:var(--leaf); min-width:90px; }
+  ol.steps { list-style:none; counter-reset:step; }
+  ol.steps li { counter-increment:step; position:relative; padding:0 0 0 44px; margin-bottom:22px; font-size:15px; }
+  ol.steps li:last-child { margin-bottom:0; }
+  ol.steps li::before { content:counter(step); position:absolute; left:0; top:-2px; width:28px; height:28px; border-radius:8px; background:var(--leaf-soft); color:var(--leaf); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .safety { background:var(--leaf-soft); border:none; }
+  .safety h2::before { background:var(--leaf); }
+  .safety p { font-size:15px; margin-bottom:10px; }
+  .safety p:last-child { margin-bottom:0; }
+  .safety strong { color:var(--leaf); }
+  footer { text-align:center; padding:32px 24px 56px; font-size:13px; color:#9AA59A; max-width:480px; margin:0 auto; }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Wszystkie przepisy</a>
+
+<header id="header"></header>
+<main id="main"></main>
+
+<footer>Pierwsze Łyżeczki — towarzyszymy w rozszerzaniu diety, krok po kroku.</footer>
+
+<script type="application/json" id="recipe-data">
+{
+  "id": "puree-z-buraczka",
+  "title": "Słodkawe puree z buraka",
+  "subtitle": "Intensywnie kolorowe i naturalnie słodkie puree, bogate w składniki odżywcze.",
+  "category": "obiad",
+  "min_age_months": 7,
+  "time_minutes": 45,
+  "servings": 1,
+  "consistency": "gladkie",
+  "ingredients": [
+    {
+      "id": "burak",
+      "name": "Burak",
+      "amount": 100,
+      "unit": "g",
+      "group": "warzywa"
+    },
+    {
+      "id": "woda",
+      "name": "Woda",
+      "amount": 100,
+      "unit": "ml",
+      "group": "inne"
+    },
+    {
+      "id": "oliwa_z_oliwek",
+      "name": "Oliwa z oliwek",
+      "amount": 1,
+      "unit": "lyzeczka",
+      "group": "tluszcze",
+      "optional": true
+    }
+  ],
+  "allergens": [],
+  "steps": [
+    "Buraka dokładnie umyj i ugotuj w skórce do miękkości (zajmuje to około 30-40 minut w zależności od wielkości).",
+    "Wyjmij buraka, lekko ostudź, a następnie obierz ze skórki (powinna łatwo schodzić).",
+    "Pokrój obranego buraczka w mniejszą kostkę.",
+    "Przełóż do miski, dodaj oliwę z oliwek i dokładnie zblenduj na idealnie gładką, purpurową masę.",
+    "W razie potrzeby dodaj odrobinę przegotowanej wody, aby ułatwić blendowanie."
+  ],
+  "safety_notes": [
+    "Po spożyciu buraka mocz oraz stolec dziecka mogą zmienić zabarwienie na czerwone — jest to całkowicie naturalne zjawisko.",
+    "Buraki najlepiej gotować w skórce, by zachować jak najwięcej cennych witamin."
+  ]
+}
+</script>
+
+<script>
+  const recipe = JSON.parse(document.getElementById('recipe-data').textContent);
+  document.getElementById('page-title').textContent = recipe.title + ' — Pierwsze Łyżeczki';
+
+  const unitLabels = { g:'g', ml:'ml', szt:'szt.', lyzka:'łyżka', lyzeczka:'łyżeczka', szczypta:'szczypta' };
+  const categoryLabels = { sniadanie:'Śniadanie', obiad:'Obiad', kolacja:'Kolacja', przekaska:'Przekąska' };
+
+  document.getElementById('header').innerHTML = `
+    <span class="eyebrow">${categoryLabels[recipe.category] || recipe.category} · ${recipe.min_age_months}+ miesięcy</span>
+    <h1 class="display">${recipe.title}</h1>
+    <p class="subtitle">${recipe.subtitle || ''}</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="num">${recipe.time_minutes} min</span><span class="label">Czas</span></div>
+      <div class="meta-item"><span class="num">${recipe.ingredients.length}</span><span class="label">Składniki</span></div>
+      <div class="meta-item"><span class="num">${recipe.servings} porcja</span><span class="label">Wydajność</span></div>
+    </div>
+  `;
+
+  const ingredientsHtml = recipe.ingredients.map(i => `
+    <li data-ingredient-id="${i.id}" data-group="${i.group}">
+      <span class="amount">${i.amount} ${unitLabels[i.unit] || i.unit}</span> ${i.name}${i.optional ? ' (opcjonalnie)' : ''}
+    </li>
+  `).join('');
+
+  const stepsHtml = recipe.steps.map(s => `<li>${s}</li>`).join('');
+  const safetyHtml = recipe.safety_notes.map(s => `<p>${s}</p>`).join('');
+  const allergensHtml = (recipe.allergens && recipe.allergens.length)
+    ? `<p><strong>Alergeny:</strong> ${recipe.allergens.join(', ')}</p>` : '';
+
+  document.getElementById('main').innerHTML = `
+    <div class="card">
+      <h2>Składniki</h2>
+      <ul class="ingredients">${ingredientsHtml}</ul>
+    </div>
+    <div class="card">
+      <h2>Przygotowanie</h2>
+      <ol class="steps">${stepsHtml}</ol>
+    </div>
+    <div class="card safety">
+      <h2>Bezpieczeństwo i wskazówki</h2>
+      ${safetyHtml}
+      ${allergensHtml}
+      <p>Ten przepis nie zastępuje konsultacji z pediatrą lub dietetykiem dziecięcym.</p>
+    </div>
+  `;
+</script>
+</body>
+</html>
